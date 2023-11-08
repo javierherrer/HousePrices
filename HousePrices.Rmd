@@ -107,11 +107,16 @@ house_prices <- cbind(
 
 ## Profiling
 
-### Determine if the response variable (price) has an acceptably normal distribution.
+### Determine if the response variable (price) has an acceptably normal distribution. Address test to discard serial correlation.
+
+The acf function in R plots the autocorrelation function of a time series, which measures the linear dependence of the series with itself at different lags.
+From this acf plot, we can conclude that the `SalePrice` variable does not exhibit any strong or consistent autocorrelation at different lags, and thus it is likely to be a random or stationary time series.
 
 From the Shapiro test, we reject the null hypothesis and conclude that the `SalePrice` variable is not normally distributed.
 
 ```{r}
+acf(house_prices$SalePrice)
+
 shapiro.test(house_prices$SalePrice)
 
 (
