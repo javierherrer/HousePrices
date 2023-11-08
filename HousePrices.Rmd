@@ -1,0 +1,111 @@
+---
+title: "House Prices"
+# TODO: Añadid vuestro nombres
+author: "Javier Herrer Torres"
+date: "`r Sys.Date()`"
+output: 
+  pdf_document: 
+    toc: true
+    toc_depth: 3
+    number_sections: true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+rm(list = ls())
+house_prices <- read.csv("train.csv")
+par(mfrow = c(1, 1))
+```
+
+## Data preparation
+
+First, the training data was imported through the `read.csv` function.
+
+Then, 10 factors are selected using the continuos description method and filtering by the 10 most related factors to the target.
+Before that, factors should have the appropiate type.
+The selected factors are:
+
+1. overall material and finish of the house,
+1. physical locations within the Ames city limits,
+1. quality of the material on the exterior,
+1. basement height evaluation,
+1. kitchen quality,
+1. interior finish of the garage,
+1. fireplace quality,
+1. type of foundation,
+1. garage location,
+1. type of dwelling involved in the sale.
+
+```{r}
+library(FactoMineR)
+
+house_prices$MSSubClass <- factor(house_prices$MSSubClass)
+house_prices$MSZoning <- factor(house_prices$MSZoning)
+house_prices$Street <- factor(house_prices$Street)
+house_prices$Alley <- factor(house_prices$Alley)
+house_prices$LotShape <- factor(house_prices$LotShape)
+house_prices$LandContour <- factor(house_prices$LandContour)
+house_prices$Utilities <- factor(house_prices$Utilities)
+house_prices$LotConfig <- factor(house_prices$LotConfig)
+house_prices$LandSlope <- factor(house_prices$LandSlop)
+house_prices$Neighborhood <- factor(house_prices$Neighborhood)
+house_prices$Condition1  <- factor(house_prices$Condition1)
+house_prices$Condition2 <- factor(house_prices$Condition2)
+house_prices$BldgType <- factor(house_prices$BldgType)
+house_prices$HouseStyle <- factor(house_prices$HouseStyle)
+house_prices$OverallQual <- factor(house_prices$OverallQual)
+house_prices$OverallCond <- factor(house_prices$OverallCond)
+house_prices$RoofStyle <- factor(house_prices$RoofStyle)
+house_prices$RoofMatl <- factor(house_prices$RoofMatl)
+house_prices$Exterior1st <- factor(house_prices$Exterior1st)
+house_prices$Exterior2nd <- factor(house_prices$Exterior2nd)
+house_prices$MasVnrType <- factor(house_prices$MasVnrType)
+house_prices$ExterQual <- factor(house_prices$ExterQual)
+house_prices$ExterCond <- factor(house_prices$ExterCond)
+house_prices$Foundation <- factor(house_prices$Foundation)
+house_prices$BsmtCond <- factor(house_prices$BsmtCond)
+house_prices$BsmtExposure <- factor(house_prices$BsmtExposure)
+house_prices$BsmtFinType1 <- factor(house_prices$BsmtFinType1)
+house_prices$BsmtFinType2 <- factor(house_prices$BsmtFinType2)
+house_prices$Heating <- factor(house_prices$Heating)
+house_prices$HeatingQC <- factor(house_prices$HeatingQC)
+house_prices$CentralAir <- factor(house_prices$CentralAir)
+house_prices$Electrical <- factor(house_prices$Electrical)
+house_prices$KitchenQual <- factor(house_prices$KitchenQual)
+house_prices$Functional <- factor(house_prices$Functional)
+house_prices$FireplaceQu <- factor(house_prices$FireplaceQu)
+house_prices$GarageFinish <- factor(house_prices$GarageFinish)
+house_prices$GarageQual <- factor(house_prices$GarageQual)
+house_prices$Heating <- factor(house_prices$Heating)
+house_prices$GarageCond <- factor(house_prices$GarageCond)
+house_prices$PavedDrive <- factor(house_prices$PavedDrive)
+house_prices$PoolQC <- factor(house_prices$PoolQC)
+house_prices$Fence <- factor(house_prices$Fence)
+house_prices$MiscFeature <- factor(house_prices$MiscFeature)
+house_prices$SaleType <- factor(house_prices$SaleType)
+house_prices$SaleCondition <- factor(house_prices$SaleCondition)
+
+continuos_description <- condes(house_prices, 81)
+continuos_description$quali
+
+relevant_factors <- rownames(continuos_description$quali[1:10, ])
+numeric_variables <- sapply(house_prices, is.numeric)
+
+house_prices <- cbind(
+  house_prices[, numeric_variables],
+  house_prices[, relevant_factors]
+)
+```
+
+
+
+
+
+
+
+
