@@ -14,6 +14,8 @@ editor_options:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+require(ggplot2)
+
 ```
 
 ```{r}
@@ -103,7 +105,37 @@ house_prices <- cbind(
 ```
 
 
+## Profiling
 
+### Determine if the response variable (price) has an acceptably normal distribution.
+
+From the Shapiro test, we reject the null hypothesis and conclude that the `SalePrice` variable is not normally distributed.
+
+```{r}
+shapiro.test(house_prices$SalePrice)
+
+(
+  ggplot(
+    data = house_prices,
+    aes(SalePrice, y = ..density..)
+  ) + geom_histogram(
+    breaks = seq(
+      0,
+      max(house_prices$SalePrice),
+      by = 1000
+    ),
+    col = "lightblue",
+    fill = "steelblue"
+  ) + geom_density(
+    lwd = 1,
+    col = "red"
+  ) + labs(
+    title = "Histogram for price with density",
+    x = "Price",
+    y = "Count"
+  )
+)
+```
 
 
 
