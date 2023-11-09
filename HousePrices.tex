@@ -1,0 +1,888 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{5}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={House Prices},
+  pdfauthor={Javier Herrer Torres},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{House Prices}
+\author{Javier Herrer Torres}
+\date{2023-11-09}
+
+\begin{document}
+\maketitle
+
+{
+\setcounter{tocdepth}{3}
+\tableofcontents
+}
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{rm}\NormalTok{(}\AttributeTok{list =} \FunctionTok{ls}\NormalTok{())}
+\NormalTok{house\_prices }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(}\StringTok{"train.csv"}\NormalTok{)}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(car)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loading required package: carData
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(missMDA)}
+\FunctionTok{library}\NormalTok{(ggplot2)}
+\FunctionTok{library}\NormalTok{(FactoMineR)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{data-preparation}{%
+\subsection{Data preparation}\label{data-preparation}}
+
+First, the training data was imported through the \texttt{read.csv}
+function.
+
+Then, 10 factors are selected using the continuos description method and
+filtering by the 10 most related factors to the target. Before that,
+factors should have the appropiate type. The selected factors are:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  overall material and finish of the house,
+\item
+  physical locations within the Ames city limits,
+\item
+  quality of the material on the exterior,
+\item
+  basement height evaluation,
+\item
+  kitchen quality,
+\item
+  interior finish of the garage,
+\item
+  fireplace quality,
+\item
+  type of foundation,
+\item
+  garage location,
+\item
+  type of dwelling involved in the sale.
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{MSSubClass }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{MSSubClass)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{MSZoning }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{MSZoning)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{Street }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{Street)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{Alley }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{Alley)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{LotShape }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{LotShape)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{LandContour }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{LandContour)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{Utilities }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{Utilities)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{LotConfig }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{LotConfig)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{LandSlope }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{LandSlop)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{Neighborhood }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{Neighborhood)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{Condition1  }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{Condition1)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{Condition2 }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{Condition2)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{BldgType }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{BldgType)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{HouseStyle }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{HouseStyle)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{OverallQual }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{OverallQual)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{OverallCond }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{OverallCond)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{RoofStyle }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{RoofStyle)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{RoofMatl }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{RoofMatl)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{Exterior1st }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{Exterior1st)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{Exterior2nd }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{Exterior2nd)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{MasVnrType }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{MasVnrType)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{ExterQual }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{ExterQual)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{ExterCond }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{ExterCond)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{Foundation }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{Foundation)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{BsmtCond }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{BsmtCond)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{BsmtExposure }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{BsmtExposure)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{BsmtFinType1 }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{BsmtFinType1)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{BsmtFinType2 }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{BsmtFinType2)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{Heating }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{Heating)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{HeatingQC }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{HeatingQC)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{CentralAir }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{CentralAir)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{Electrical }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{Electrical)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{KitchenQual }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{KitchenQual)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{Functional }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{Functional)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{FireplaceQu }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{FireplaceQu)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{GarageFinish }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{GarageFinish)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{GarageQual }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{GarageQual)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{Heating }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{Heating)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{GarageCond }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{GarageCond)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{PavedDrive }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{PavedDrive)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{PoolQC }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{PoolQC)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{Fence }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{Fence)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{MiscFeature }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{MiscFeature)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{SaleType }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{SaleType)}
+\NormalTok{house\_prices}\SpecialCharTok{$}\NormalTok{SaleCondition }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{SaleCondition)}
+
+\NormalTok{continuos\_description }\OtherTok{\textless{}{-}} \FunctionTok{condes}\NormalTok{(house\_prices, }\DecValTok{81}\NormalTok{)}
+\NormalTok{continuos\_description}\SpecialCharTok{$}\NormalTok{quali}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                        R2       p.value
+## OverallQual   0.684181287  0.000000e+00
+## Neighborhood  0.545574991 1.558600e-225
+## ExterQual     0.477387778 1.439551e-204
+## BsmtQual      0.464993778 8.158548e-196
+## KitchenQual   0.456598624 3.032213e-192
+## GarageFinish  0.305873737 6.228747e-115
+## FireplaceQu   0.293960754 2.971217e-107
+## Foundation    0.256368402  5.791895e-91
+## GarageType    0.249204231  6.117026e-87
+## MSSubClass    0.246315973  8.662166e-79
+## BsmtFinType1  0.210810410  2.386358e-71
+## HeatingQC     0.195500486  2.667062e-67
+## MasVnrType    0.188822500  1.054025e-64
+## BsmtExposure  0.149500332  7.557758e-50
+## SaleCondition 0.135497477  7.988268e-44
+## Exterior1st   0.152773123  2.586089e-43
+## Exterior2nd   0.153829860  4.842186e-43
+## SaleType      0.137287487  5.039767e-42
+## OverallCond   0.125390116  7.962289e-38
+## MSZoning      0.107559683  8.817634e-35
+## HouseStyle    0.086312627  3.376777e-25
+## GarageQual    0.081421478  5.388762e-25
+## GarageCond    0.081346203  5.711746e-25
+## LotShape      0.076375708  6.447524e-25
+## CentralAir    0.063165846  1.809506e-22
+## PavedDrive    0.054539728  1.803569e-18
+## Electrical    0.059691460  8.226925e-18
+## RoofStyle     0.057696630  3.653523e-17
+## BsmtCond      0.051395803  8.195794e-16
+## Fence         0.035614717  9.379977e-11
+## BldgType      0.034534027  2.056736e-10
+## LandContour   0.025794085  2.742217e-08
+## BsmtFinType2  0.030293984  5.225649e-08
+## RoofMatl      0.031413123  7.231445e-08
+## Condition1    0.032630640  8.904549e-08
+## Alley         0.020407545  2.996380e-07
+## ExterCond     0.023617621  5.106681e-07
+## PoolQC        0.021195920  7.700989e-07
+## LotConfig     0.021019365  3.163167e-06
+## Functional    0.016480386  4.841697e-04
+## Heating       0.014437135  7.534721e-04
+## MiscFeature   0.007079753  3.500367e-02
+## Condition2    0.009899161  4.342566e-02
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{relevant\_factors }\OtherTok{\textless{}{-}} \FunctionTok{rownames}\NormalTok{(continuos\_description}\SpecialCharTok{$}\NormalTok{quali[}\DecValTok{1}\SpecialCharTok{:}\DecValTok{10}\NormalTok{, ])}
+\NormalTok{numeric\_variables }\OtherTok{\textless{}{-}} \FunctionTok{sapply}\NormalTok{(house\_prices, is.numeric)}
+
+\NormalTok{house\_prices }\OtherTok{\textless{}{-}} \FunctionTok{cbind}\NormalTok{(}
+\NormalTok{  house\_prices[, numeric\_variables],}
+\NormalTok{  house\_prices[, relevant\_factors]}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{variable-analysis}{%
+\subsection{Variable Analysis}\label{variable-analysis}}
+
+\textcolor{blue}{Variable 24: GarageCars}
+
+This is a discrete quantitative variable. The data is not normally
+distributed, which is confirmed by the near-null p-value of the shapiro
+normallity test. It contains no missing values thus imputation is not
+needed. The variable contains 5 outliers (out of which 0 severe), all on
+the higher end of the spectrum.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{GarageCars)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   0.000   1.000   2.000   1.767   2.000   4.000
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Plotting}
+\FunctionTok{hist}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{GarageCars,}
+     \AttributeTok{main =} \StringTok{"Garage Size by Car Capacity"}\NormalTok{,}
+     \AttributeTok{xlab =} \StringTok{"Number of Cars"}\NormalTok{,}
+     \AttributeTok{ylab =} \StringTok{"Density"}\NormalTok{,}
+     \AttributeTok{freq =}\NormalTok{ F,}
+\NormalTok{)}
+\FunctionTok{curve}\NormalTok{(}\FunctionTok{dnorm}\NormalTok{(x, }\FunctionTok{mean}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{GarageCars), }\FunctionTok{sd}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{GarageCars)), }\AttributeTok{add =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{col =} \StringTok{"red"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{HousePrices_files/figure-latex/unnamed-chunk-4-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{shapiro.test}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{GarageCars)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Shapiro-Wilk normality test
+## 
+## data:  house_prices$GarageCars
+## W = 0.83537, p-value < 2.2e-16
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Missing values}
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{GarageCars))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Univariant Outliers}
+\FunctionTok{length}\NormalTok{(}\FunctionTok{Boxplot}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{GarageCars,}
+        \AttributeTok{main =} \StringTok{"Boxplot of Garage Size by Car Capacity"}\NormalTok{,}
+        \AttributeTok{xlab =} \StringTok{"Number of Cars"}\NormalTok{,}
+        \AttributeTok{ylab =} \StringTok{"Garage Size"}\NormalTok{,}
+        \AttributeTok{id =} \FunctionTok{list}\NormalTok{(}\AttributeTok{n=}\ConstantTok{Inf}\NormalTok{)}
+\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{HousePrices_files/figure-latex/unnamed-chunk-4-2.pdf}
+
+\begin{verbatim}
+## [1] 5
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sev\_up }\OtherTok{=}\NormalTok{ (}\FunctionTok{quantile}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{GarageCars,}\FloatTok{0.75}\NormalTok{)}\SpecialCharTok{+}\NormalTok{(}\DecValTok{3}\SpecialCharTok{*}\NormalTok{((}\FunctionTok{quantile}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{GarageCars,}\FloatTok{0.75}\NormalTok{)}\SpecialCharTok{{-}}\FunctionTok{quantile}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{GarageCars,}\FloatTok{0.25}\NormalTok{)))))}
+\FunctionTok{length}\NormalTok{(}\FunctionTok{which}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{GarageCars }\SpecialCharTok{\textgreater{}}\NormalTok{ sev\_up))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\textcolor{blue}{Variable 25: GarageArea}
+
+This is a continuous ratio variable. The data is not normally
+distributed, which is confirmed by the near-null p-value of the shapiro
+normallity test. It contains no missing values thus imputation is not
+needed. The variable contains 21 outliers (out of which 3 severe), all
+on the higher end of the spectrum.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{GarageArea)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##     0.0   334.5   480.0   473.0   576.0  1418.0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Plotting}
+\FunctionTok{hist}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{GarageArea,}
+     \AttributeTok{main =} \StringTok{"Garage Size by Area in square feet"}\NormalTok{,}
+     \AttributeTok{xlab =} \StringTok{"Area in square feet"}\NormalTok{,}
+     \AttributeTok{ylab =} \StringTok{"Density"}\NormalTok{,}
+     \AttributeTok{freq =}\NormalTok{ F,}
+\NormalTok{)}
+\FunctionTok{curve}\NormalTok{(}\FunctionTok{dnorm}\NormalTok{(x, }\FunctionTok{mean}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{GarageArea), }\FunctionTok{sd}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{GarageArea)), }\AttributeTok{add =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{col =} \StringTok{"red"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{HousePrices_files/figure-latex/unnamed-chunk-5-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{shapiro.test}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{GarageArea)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Shapiro-Wilk normality test
+## 
+## data:  house_prices$GarageArea
+## W = 0.97533, p-value = 4.017e-15
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Missing values}
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{GarageArea))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Univariant Outliers}
+\FunctionTok{length}\NormalTok{(}\FunctionTok{Boxplot}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{GarageArea, }\AttributeTok{id =} \FunctionTok{list}\NormalTok{(}\AttributeTok{n=}\ConstantTok{Inf}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{HousePrices_files/figure-latex/unnamed-chunk-5-2.pdf}
+
+\begin{verbatim}
+## [1] 21
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sev\_up }\OtherTok{=}\NormalTok{ (}\FunctionTok{quantile}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{GarageArea,}\FloatTok{0.75}\NormalTok{)}\SpecialCharTok{+}\NormalTok{(}\DecValTok{3}\SpecialCharTok{*}\NormalTok{((}\FunctionTok{quantile}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{GarageArea,}\FloatTok{0.75}\NormalTok{)}\SpecialCharTok{{-}}\FunctionTok{quantile}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{GarageArea,}\FloatTok{0.25}\NormalTok{)))))}
+\FunctionTok{length}\NormalTok{(}\FunctionTok{which}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{GarageArea }\SpecialCharTok{\textgreater{}}\NormalTok{ sev\_up))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 3
+\end{verbatim}
+
+\textcolor{blue}{Variable 26: WoodDeckSF}
+
+This is a continuous ratio variable. The data is not normally
+distributed, which is confirmed by the near-null p-value of the shapiro
+normallity test. It contains no missing values thus imputation is not
+needed. The variable contains 32 outliers (out of which 3 severe), all
+on the higher end of the spectrum.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{WoodDeckSF)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    0.00    0.00    0.00   94.24  168.00  857.00
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Plotting}
+\FunctionTok{hist}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{WoodDeckSF,}
+     \AttributeTok{main =} \StringTok{"Wood deck area in square feet"}\NormalTok{,}
+     \AttributeTok{xlab =} \StringTok{"Area in square feet"}\NormalTok{,}
+     \AttributeTok{ylab =} \StringTok{"Density"}\NormalTok{,}
+     \AttributeTok{freq =}\NormalTok{ F,}
+\NormalTok{)}
+\FunctionTok{curve}\NormalTok{(}\FunctionTok{dnorm}\NormalTok{(x, }\FunctionTok{mean}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{WoodDeckSF), }\FunctionTok{sd}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{WoodDeckSF)), }\AttributeTok{add =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{col =} \StringTok{"red"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{HousePrices_files/figure-latex/unnamed-chunk-6-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{shapiro.test}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{WoodDeckSF)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Shapiro-Wilk normality test
+## 
+## data:  house_prices$WoodDeckSF
+## W = 0.76852, p-value < 2.2e-16
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Missing values}
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{WoodDeckSF))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Univariant Outliers}
+\FunctionTok{length}\NormalTok{(}\FunctionTok{Boxplot}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{WoodDeckSF, }\AttributeTok{id =} \FunctionTok{list}\NormalTok{(}\AttributeTok{n=}\ConstantTok{Inf}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{HousePrices_files/figure-latex/unnamed-chunk-6-2.pdf}
+
+\begin{verbatim}
+## [1] 32
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sev\_up }\OtherTok{=}\NormalTok{ (}\FunctionTok{quantile}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{WoodDeckSF,}\FloatTok{0.75}\NormalTok{)}\SpecialCharTok{+}\NormalTok{(}\DecValTok{3}\SpecialCharTok{*}\NormalTok{((}\FunctionTok{quantile}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{WoodDeckSF,}\FloatTok{0.75}\NormalTok{)}\SpecialCharTok{{-}}\FunctionTok{quantile}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{WoodDeckSF,}\FloatTok{0.25}\NormalTok{)))))}
+\FunctionTok{length}\NormalTok{(}\FunctionTok{which}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{WoodDeckSF }\SpecialCharTok{\textgreater{}}\NormalTok{ sev\_up))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 3
+\end{verbatim}
+
+\textcolor{blue}{Variable 27: OpenPorchSF}
+
+This is a continuous ratio variable. The data is not normally
+distributed, which is confirmed by the near-null p-value of the shapiro
+normallity test. It contains no missing values thus imputation is not
+needed. The variable contains 77 outliers (out of which 18 severe), all
+on the higher end of the spectrum.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{OpenPorchSF)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    0.00    0.00   25.00   46.66   68.00  547.00
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Plotting}
+\FunctionTok{hist}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{OpenPorchSF,}
+     \AttributeTok{main =} \StringTok{"Open porch area in square feet"}\NormalTok{,}
+     \AttributeTok{xlab =} \StringTok{"Area in square feet"}\NormalTok{,}
+     \AttributeTok{ylab =} \StringTok{"Density"}\NormalTok{,}
+     \AttributeTok{freq =}\NormalTok{ F,}
+\NormalTok{)}
+\FunctionTok{curve}\NormalTok{(}\FunctionTok{dnorm}\NormalTok{(x, }\FunctionTok{mean}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{OpenPorchSF), }\FunctionTok{sd}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{OpenPorchSF)), }\AttributeTok{add =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{col =} \StringTok{"red"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{HousePrices_files/figure-latex/unnamed-chunk-7-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{shapiro.test}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{OpenPorchSF)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Shapiro-Wilk normality test
+## 
+## data:  house_prices$OpenPorchSF
+## W = 0.72717, p-value < 2.2e-16
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Missing values}
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{OpenPorchSF))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Univariant Outliers}
+\FunctionTok{length}\NormalTok{(}\FunctionTok{Boxplot}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{OpenPorchSF, }\AttributeTok{id =} \FunctionTok{list}\NormalTok{(}\AttributeTok{n=}\ConstantTok{Inf}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{HousePrices_files/figure-latex/unnamed-chunk-7-2.pdf}
+
+\begin{verbatim}
+## [1] 77
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sev\_up }\OtherTok{=}\NormalTok{ (}\FunctionTok{quantile}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{OpenPorchSF,}\FloatTok{0.75}\NormalTok{)}\SpecialCharTok{+}\NormalTok{(}\DecValTok{3}\SpecialCharTok{*}\NormalTok{((}\FunctionTok{quantile}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{OpenPorchSF,}\FloatTok{0.75}\NormalTok{)}\SpecialCharTok{{-}}\FunctionTok{quantile}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{OpenPorchSF,}\FloatTok{0.25}\NormalTok{)))))}
+\FunctionTok{length}\NormalTok{(}\FunctionTok{which}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{OpenPorchSF }\SpecialCharTok{\textgreater{}}\NormalTok{ sev\_up))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 18
+\end{verbatim}
+
+\textcolor{blue}{Variable 28: EnclosedPorch}
+
+This is a continuous ratio variable. The data is not normally
+distributed, which is confirmed by the near-null p-value of the shapiro
+normallity test. It contains no missing values thus imputation is not
+needed. The variable contains 208 outliers (out of which 208 severe).
+This occurs because the majority of houses don't have an enclosed porch,
+so any house with an enclosed porch is considered an outlier.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{EnclosedPorch)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    0.00    0.00    0.00   21.95    0.00  552.00
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Plotting}
+\FunctionTok{hist}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{EnclosedPorch,}
+     \AttributeTok{main =} \StringTok{"Enclosed porch area in square feet"}\NormalTok{,}
+     \AttributeTok{xlab =} \StringTok{"Area in square feet"}\NormalTok{,}
+     \AttributeTok{ylab =} \StringTok{"Density"}\NormalTok{,}
+     \AttributeTok{freq =}\NormalTok{ F,}
+\NormalTok{)}
+\FunctionTok{curve}\NormalTok{(}\FunctionTok{dnorm}\NormalTok{(x, }\FunctionTok{mean}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{EnclosedPorch), }\FunctionTok{sd}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{EnclosedPorch)), }\AttributeTok{add =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{col =} \StringTok{"red"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{HousePrices_files/figure-latex/unnamed-chunk-8-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{shapiro.test}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{EnclosedPorch)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Shapiro-Wilk normality test
+## 
+## data:  house_prices$EnclosedPorch
+## W = 0.41444, p-value < 2.2e-16
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Missing values}
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{EnclosedPorch))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Univariant Outliers}
+\FunctionTok{length}\NormalTok{(}\FunctionTok{Boxplot}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{EnclosedPorch, }\AttributeTok{id =} \FunctionTok{list}\NormalTok{(}\AttributeTok{n=}\ConstantTok{Inf}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{HousePrices_files/figure-latex/unnamed-chunk-8-2.pdf}
+
+\begin{verbatim}
+## [1] 208
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sev\_up }\OtherTok{=}\NormalTok{ (}\FunctionTok{quantile}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{EnclosedPorch,}\FloatTok{0.75}\NormalTok{)}\SpecialCharTok{+}\NormalTok{(}\DecValTok{3}\SpecialCharTok{*}\NormalTok{((}\FunctionTok{quantile}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{EnclosedPorch,}\FloatTok{0.75}\NormalTok{)}\SpecialCharTok{{-}}\FunctionTok{quantile}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{EnclosedPorch,}\FloatTok{0.25}\NormalTok{)))))}
+\FunctionTok{length}\NormalTok{(}\FunctionTok{which}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{EnclosedPorch }\SpecialCharTok{\textgreater{}}\NormalTok{ sev\_up))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 208
+\end{verbatim}
+
+\textcolor{blue}{Variable 29: X3SsnPorch}
+
+This is a continuous ratio variable. The data is not normally
+distributed, which is confirmed by the near-null p-value of the shapiro
+normallity test. It contains no missing values thus imputation is not
+needed. The variable contains 24 outliers (out of which 24 severe). This
+occurs because the majority of houses don't have a three season porch,
+so any house with a three season porch is considered an outlier.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{X3SsnPorch)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    0.00    0.00    0.00    3.41    0.00  508.00
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Plotting}
+\FunctionTok{hist}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{X3SsnPorch,}
+     \AttributeTok{main =} \StringTok{"Three season porch area in square feet"}\NormalTok{,}
+     \AttributeTok{xlab =} \StringTok{"Area in square feet"}\NormalTok{,}
+     \AttributeTok{ylab =} \StringTok{"Density"}\NormalTok{,}
+     \AttributeTok{freq =}\NormalTok{ F,}
+\NormalTok{)}
+\FunctionTok{curve}\NormalTok{(}\FunctionTok{dnorm}\NormalTok{(x, }\FunctionTok{mean}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{X3SsnPorch), }\FunctionTok{sd}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{X3SsnPorch)), }\AttributeTok{add =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{col =} \StringTok{"red"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{HousePrices_files/figure-latex/unnamed-chunk-9-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{shapiro.test}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{X3SsnPorch)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Shapiro-Wilk normality test
+## 
+## data:  house_prices$X3SsnPorch
+## W = 0.094934, p-value < 2.2e-16
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Missing values}
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{X3SsnPorch))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Univariant Outliers}
+\FunctionTok{length}\NormalTok{(}\FunctionTok{Boxplot}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{X3SsnPorch, }\AttributeTok{id =} \FunctionTok{list}\NormalTok{(}\AttributeTok{n=}\ConstantTok{Inf}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{HousePrices_files/figure-latex/unnamed-chunk-9-2.pdf}
+
+\begin{verbatim}
+## [1] 24
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sev\_up }\OtherTok{=}\NormalTok{ (}\FunctionTok{quantile}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{X3SsnPorch,}\FloatTok{0.75}\NormalTok{)}\SpecialCharTok{+}\NormalTok{(}\DecValTok{3}\SpecialCharTok{*}\NormalTok{((}\FunctionTok{quantile}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{X3SsnPorch,}\FloatTok{0.75}\NormalTok{)}\SpecialCharTok{{-}}\FunctionTok{quantile}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{X3SsnPorch,}\FloatTok{0.25}\NormalTok{)))))}
+\FunctionTok{length}\NormalTok{(}\FunctionTok{which}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{X3SsnPorch }\SpecialCharTok{\textgreater{}}\NormalTok{ sev\_up))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 24
+\end{verbatim}
+
+\textcolor{blue}{Variable 30: ScreenPorch}
+
+This is a continuous ratio variable. The data is not normally
+distributed, which is confirmed by the near-null p-value of the shapiro
+normallity test. It contains no missing values thus imputation is not
+needed. The variable contains 116 outliers (out of which 116 severe).
+This occurs because the majority of houses don't have a screen porch, so
+any house with a screen porch is considered an outlier.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{ScreenPorch)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    0.00    0.00    0.00   15.06    0.00  480.00
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Plotting}
+\FunctionTok{hist}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{ScreenPorch,}
+     \AttributeTok{main =} \StringTok{"Screen porch area in square feet"}\NormalTok{,}
+     \AttributeTok{xlab =} \StringTok{"Area in square feet"}\NormalTok{,}
+     \AttributeTok{ylab =} \StringTok{"Density"}\NormalTok{,}
+     \AttributeTok{freq =}\NormalTok{ F,}
+\NormalTok{)}
+\FunctionTok{curve}\NormalTok{(}\FunctionTok{dnorm}\NormalTok{(x, }\FunctionTok{mean}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{ScreenPorch), }\FunctionTok{sd}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{ScreenPorch)), }\AttributeTok{add =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{col =} \StringTok{"red"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{HousePrices_files/figure-latex/unnamed-chunk-10-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{shapiro.test}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{ScreenPorch)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Shapiro-Wilk normality test
+## 
+## data:  house_prices$ScreenPorch
+## W = 0.29821, p-value < 2.2e-16
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Missing values}
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{ScreenPorch))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Imputing missing values}
+\CommentTok{\#res.pca\textless{}{-}imputePCA(house\_prices[,c(2:)])}
+
+\CommentTok{\#Univariant Outliers}
+\FunctionTok{length}\NormalTok{(}\FunctionTok{Boxplot}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{ScreenPorch, }\AttributeTok{id =} \FunctionTok{list}\NormalTok{(}\AttributeTok{n=}\ConstantTok{Inf}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{HousePrices_files/figure-latex/unnamed-chunk-10-2.pdf}
+
+\begin{verbatim}
+## [1] 116
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sev\_up }\OtherTok{=}\NormalTok{ (}\FunctionTok{quantile}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{ScreenPorch,}\FloatTok{0.75}\NormalTok{)}\SpecialCharTok{+}\NormalTok{(}\DecValTok{3}\SpecialCharTok{*}\NormalTok{((}\FunctionTok{quantile}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{ScreenPorch,}\FloatTok{0.75}\NormalTok{)}\SpecialCharTok{{-}}\FunctionTok{quantile}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{ScreenPorch,}\FloatTok{0.25}\NormalTok{)))))}
+\FunctionTok{length}\NormalTok{(}\FunctionTok{which}\NormalTok{(house\_prices}\SpecialCharTok{$}\NormalTok{ScreenPorch }\SpecialCharTok{\textgreater{}}\NormalTok{ sev\_up))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 116
+\end{verbatim}
+
+\end{document}
