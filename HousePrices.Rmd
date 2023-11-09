@@ -14,6 +14,8 @@ editor_options:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+require(ggplot2)
+
 ```
 
 ```{r}
@@ -1042,3 +1044,45 @@ sum(is.na(house_prices$MSSubClass))
 ```
 
 ## Data quality report
+
+## Profiling
+
+### Determine if the response variable (price) has an acceptably normal distribution. Address test to discard serial correlation.
+
+The acf function in R plots the autocorrelation function of a time series, which measures the linear dependence of the series with itself at different lags.
+From this acf plot, we can conclude that the `SalePrice` variable does not exhibit any strong or consistent autocorrelation at different lags, and thus it is likely to be a random or stationary time series.
+
+From the Shapiro test, we reject the null hypothesis and conclude that the `SalePrice` variable is not normally distributed.
+
+```{r}
+acf(house_prices$SalePrice)
+
+shapiro.test(house_prices$SalePrice)
+
+(
+  ggplot(
+    data = house_prices,
+    aes(SalePrice, y = ..density..)
+  ) + geom_histogram(
+    breaks = seq(
+      0,
+      max(house_prices$SalePrice),
+      by = 1000
+    ),
+    col = "lightblue",
+    fill = "steelblue"
+  ) + geom_density(
+    lwd = 1,
+    col = "red"
+  ) + labs(
+    title = "Histogram for price with density",
+    x = "Price",
+    y = "Count"
+  )
+)
+```
+
+
+
+
+
