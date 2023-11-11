@@ -1177,6 +1177,45 @@ shapiro.test(house_prices$SalePrice)
 ```
 
 
+### Categorize numeric variables.
+
+Following the initial analysis on the numeric variables, these 3 columns have been categorized:
+
+1. Linear feet of street connected to property.
+1. Lot size in square feet.
+1. Original construction date.
 
 
+```{r}
+cols <- c("LotFrontage", "LotArea", "YearBuilt")
+new_cols <- c("f.LotFrontage", "f.LotArea", "f.YearBuilt")
+levels_list <- list(
+  c(0, 59, 70, 80, 313), # LotFrontage
+  c(0, 5000, 10000, 20000, 50000, 215245), # LotArea
+  c(1872, 1915, 1945, 1960, 1980, 2000, 2010) # YearBuilt
+)
+labels_list <- list(
+  c("Very Low", "Low", "Medium", "High"), # LotFrontage
+  c("Small", "Medium", "Large", "Huge", "Very Huge"), # LotArea
+  c(
+    "Historic", "Pre-War", "Post-War", "Mid-Century",
+    "Modern", "Contemporary"
+  ) # YearBuilt
+)
 
+# TODO: Do not forget to implement new variable definitions in the test sample.
+house_prices[new_cols] <- lapply(
+  seq_along(cols),
+  function(i) {
+    factor(
+      cut(
+        house_prices[[cols[i]]],
+        breaks = levels_list[[i]],
+        labels = labels_list[[i]],
+        right = TRUE,
+        include.lowest = TRUE
+      )
+    )
+  }
+)
+```
