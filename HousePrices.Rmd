@@ -15,21 +15,17 @@ editor_options:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 require(ggplot2)
-
+library(car)
+library(missMDA)
+library(ggplot2)
+library(FactoMineR)
+library(chemometrics)
 ```
 
 ```{r}
 rm(list = ls())
 house_prices <- read.csv("train.csv")
 par(mfrow = c(1, 1))
-```
-
-```{r}
-library(car)
-library(missMDA)
-library(ggplot2)
-library(FactoMineR)
-library(chemometrics)
 ```
 
 ## Data preparation
@@ -134,7 +130,7 @@ levels_list <- list(
   1:10, # OverallQual
   c(
     "Blmngtn", "Blueste", "BrDale", "BrkSide", "ClearCr", "CollgCr", "Crawfor",
-    "Edwards", "Gilbert", "IDOTRR", "MeadowV", "Mitchel", "Names", "NoRidge",
+    "Edwards", "Gilbert", "IDOTRR", "MeadowV", "Mitchel", "NAmes", "NoRidge",
     "NPkVill","NridgHt", "NWAmes", "OldTown", "SWISU", "Sawyer", "SawyerW",
     "Somerst", "StoneBr", "Timber", "Veenker"
   ), # Neighborhood
@@ -174,11 +170,12 @@ labels_list <- list(
   c("Excellent", "Good", "Typical/Average", "Fair", "Poor"), # KitchenQual
   c("Finished", "Rough Finished", "Unfinished", "No Garage"), # GarageFinish
   c(
-    "Excellent - Exceptional Masonry Fireplace",
-    "Good - Masonry Fireplace in main level",
-    "Average - Prefabricated Fireplace in main living area or Masonry Fireplace in basement", # nolint: line_length_linter.
-    "Fair - Prefabricated Fireplace in basement",
-    "Poor - Ben Franklin Stove", "No Fireplace"
+    "Excellent",
+    "Good",
+    "Average", # nolint: line_length_linter.
+    "Fair",
+    "Poor", 
+    "No Fireplace"
   ), # FireplaceQu
   c(
     "Brick & Tile", "Cinder Block", "Poured Contrete", "Slab", "Stone", "Wood"
@@ -219,7 +216,8 @@ house_prices[cols] <- lapply(
 
 *variable 1: LotFrontage*
 
-LotFrontage is a numerical variable with 259 NA's.  Then we used a histogram and a Boxplot to visualize the distribution of the values of this variable. By using a Shapiro test we observed a non-normal distribution for LotFrontage (p-value near 0).Afterwards, we computed the InterQuartileRange to build the thresholds for severe outliers. 88 outliers were observed,from which 12 were severe outliers. 
+LotFrontage is a numerical variable with 259 NA's.  Then we used a histogram and a Boxplot to visualize the distribution of the values of this variable. By using a Shapiro test we observed a non-normal distribution for LotFrontage (p-value near 0). Afterwards, we computed the InterQuartileRange to build the thresholds for severe outliers. 88 outliers were observed, from which 12 were severe outliers.
+
 ```{r}
 summary(house_prices$LotFrontage)
 # Histogram plotting
@@ -638,7 +636,7 @@ sum(is.na(house_prices$HalfBath))
 
 *variable 18: BedroomAbvGr*
 
-BedroomAbvGr is a numerical variable but contains only 16 possible values. Here we decided to categorize it with as.factor(). Then we used a barplot to visualize the distribution of the values of this variable. No missings were observed.
+BedroomAbvGr is a numerical variable but contains only 9 possible values. Here we decided to categorize it with as.factor(). Then we used a barplot to visualize the distribution of the values of this variable. No missings were observed.
 ```{r}
 summary(house_prices$BedroomAbvGr)
 house_prices$BedroomAbvGr <- as.factor(house_prices$BedroomAbvGr)
@@ -690,7 +688,7 @@ sum(is.na(house_prices$Fireplaces))
 
 *variable 22: GarageYrBlt*
 
-GarageYrBlt is a numeric interval variable. It contains 81 NA's. By using a Shapiro test we observed a non-normal distribution for YearBuilt (p-value < 2.2e-16). Afterwards, we computed the InterQuartileRange to build the thresholds for severe outliers. 0 outliers were seen in this variable.
+GarageYrBlt is a numeric interval variable. It contains 81 NA's, that correspond to the houses with no garages. By using a Shapiro test we observed a non-normal distribution for YearBuilt (p-value < 2.2e-16). Afterwards, we computed the InterQuartileRange to build the thresholds for severe outliers. 0 outliers were seen in this variable.
 ```{r}
 summary(house_prices$GarageYrBlt)
 # Histogram plotting
@@ -712,28 +710,18 @@ Boxplot(house_prices$GarageYrBlt, id = list(n=Inf))
 
 *variable 23: GarageCars*
 
-This is a discrete quantitative variable. The data is not normally distributed, which is confirmed by the near-null p-value of the shapiro normallity test. It contains no missing values thus imputation is not needed. The variable contains 5 outliers (out of which 0 severe), all on the higher end of the spectrum.
+This is a discrete quantitative variable, with only 5 values. It contains no missing values thus imputation is not needed. The variable contains 5 outliers (out of which 0 severe), all on the higher end of the spectrum.
 ```{r}
 summary(house_prices$GarageCars)
+house_prices$GarageCars <- as.factor(house_prices$GarageCars)
 # Plotting
 barplot(table(house_prices$GarageCars), 
      xlab = "Number of Cars",
      ylab = "Density",
      main = "Garage Size by Car Capacity")
 
-shapiro.test(house_prices$GarageCars)
 #Missing values
 sum(is.na(house_prices$GarageCars))
-
-#Univariant Outliers
-length(Boxplot(house_prices$GarageCars,
-        main = "Boxplot of Garage Size by Car Capacity",
-        xlab = "Number of Cars",
-        ylab = "Garage Size",
-        id = list(n=Inf)
-))
-sev_up = (quantile(house_prices$GarageCars,0.75)+(3*((quantile(house_prices$GarageCars,0.75)-quantile(house_prices$GarageCars,0.25)))))
-length(which(house_prices$GarageCars > sev_up))
 ```
 
 *variable 24: GarageArea*
@@ -1036,7 +1024,7 @@ sum(is.na(house_prices$ExterQual))
 
 *variable 38: BsmtQual*
 
-This is a nominal categorical variable (with 6 levels), in which 43% of the instances are "Good (90-99 inches)" and 46% are "Typical (80-89 inches)". The "Poor (<70 inches)" level has 0 instances, and 2.5% of houses don't have a basement. Missing values correspond to houses with no basement. A bar plot is used to plot the variable.
+This is a nominal categorical variable (with 6 levels), in which 42% of the instances are "Good (90-99 inches)" and 44% are "Typical (80-89 inches)". The "Poor (<70 inches)" level has 0 instances, and 2.5% of houses don't have a basement. A bar plot is used to plot the variable.
 ```{r}
 table(house_prices$BsmtQual)
 prop.table(table(house_prices$BsmtQual))
@@ -1048,8 +1036,6 @@ barplot(table(house_prices$BsmtQual),
         ) 
 #Missing values ----> añadir si no se ha hecho antes
 sum(is.na(house_prices$BsmtQual))
-# ll_na <- which(is.na(house_prices$BsmtQual))
-# house_prices$BsmtQual[ll_na] <- "No Basement"
 ```
 
 *variable 39: KitchenQual*
@@ -1070,7 +1056,7 @@ sum(is.na(house_prices$KitchenQual))
 
 *variable 40: GarageFinish*
 
-This is a nominal categorical variable (with 4 levels). It is visualized by a bar plot, in which it is clear that all levels are well represented. Therefore, no outliers are present. Missing values correspond to houses with no garages.
+This is a nominal categorical variable (with 4 levels). It is visualized by a bar plot, in which houses with no garage represent only 5.5% of the instances.
 ```{r}
 table(house_prices$GarageFinish)
 prop.table(table(house_prices$GarageFinish))
@@ -1086,7 +1072,7 @@ sum(is.na(house_prices$GarageFinish))
 
 *variable 41: FireplaceQu*
 
-This is a nominal categorical variable (with 6 levels), in which 49% of the instances are "Good" and 41% are "Average". The "Poor" level has 20 instances (2.6%). Missing values correspond to houses with no fireplaces, thus 47% of the houses have no fireplace.
+This is a nominal categorical variable (with 6 levels), in which 49% of the instances are "Good" and 41% are "Average". The "Poor" level has 20 instances (2.6%). 47% of the houses have no fireplace.
 ```{r}
 table(house_prices$FireplaceQu)
 prop.table(table(house_prices$FireplaceQu))
@@ -1118,7 +1104,7 @@ sum(is.na(house_prices$Foundation))
 
 *variable 43: GarageType*
 
-This is a nominal categorical variable (with 7 levels), in which ..% of the instances are "Attached to home" and ..% are "Detached from home". "More than one type of garage", "Basement Garage" and "Car Port" levels combined represent only ...% of the instances. Missing values correspond to houses with no garage, thus ..% of the houses have no garage
+This is a nominal categorical variable (with 7 levels), in which 60% of the instances are "Attached to home" and 27% are "Detached from home". "More than one type of garage", "Basement Garage" and "Car Port" levels combined represent only 2.3% of the instances. 5.5% of the houses have no garage
 ```{r}
 table(house_prices$GarageType)
 prop.table(table(house_prices$GarageType))
@@ -1126,7 +1112,8 @@ prop.table(table(house_prices$GarageType))
 barplot(table(house_prices$GarageType), 
         xlab = "",
         ylab = "Frequency",
-        main = "Garage location"
+        main = "Garage location",
+        las = 2
         ) 
 #Missing values
 sum(is.na(house_prices$GarageType))
@@ -1142,13 +1129,38 @@ prop.table(table(house_prices$MSSubClass))
 barplot(table(house_prices$MSSubClass), 
         xlab = "",
         ylab = "Frequency",
-        main = "Type of dwelling involved in the sale."
+        main = "Type of dwelling involved in the sale.",
+        las = 2
         ) 
 #Missing values
 sum(is.na(house_prices$MSSubClass))
 ```
 
 ## Data quality report
+
+### Missing Imputation
+
+Missing imputation after or before Multivariate Outliers????
+Garage year built --> 81 NA's that correspond to houses with no garage, how can we impute them?
+
+### Multivariate Outliers
+
+Moutlier is applied on some numerical variables to find multivariate outliers. We chose the variables that don't return a singular matrix. A very mild threshold of 0.25% is chosen as significance level because it already returns a significant amount of outliers, more exactly around 3% of instances. It is chosen to delete these outliers from the data set for the rest of the project.
+
+```{r}
+res.out = Moutlier(house_prices[,c(3,4,7,10,14,25,27,33,35)], quantile = 0.9975, col="blue")
+which((res.out$md > res.out$cutoff)&(res.out$rd > res.out$cutoff))
+length(which((res.out$md > res.out$cutoff)&(res.out$rd > res.out$cutoff)) )/1460
+
+par(mfrow=c(1,1))
+plot( res.out$md, res.out$rd )
+abline(h=res.out$cutoff, col="red")
+abline(v=res.out$cutoff, col="red")
+
+summary(house_prices[which((res.out$md > res.out$cutoff)&(res.out$rd > res.out$cutoff)),])
+summary(house_prices)
+house_prices = house_prices[-which((res.out$md > res.out$cutoff)&(res.out$rd > res.out$cutoff )),]
+```
 
 ## Profiling
 
@@ -1186,7 +1198,6 @@ shapiro.test(house_prices$SalePrice)
   )
 )
 ```
-
 
 ### Categorize numeric variables.
 
