@@ -52,6 +52,17 @@ The selected factors are:
 1. type of dwelling involved in the sale.
 
 ```{r}
+library(tidyr)
+
+na_factor_cols <- c("BsmtQual", "GarageFinish", "FireplaceQu", "GarageType")
+
+house_prices[na_factor_cols] <- lapply(
+  house_prices[na_factor_cols],
+  function(x) {
+    replace_na(x, "NA")
+  }
+)
+
 house_prices$MSSubClass <- factor(house_prices$MSSubClass)
 house_prices$MSZoning <- factor(house_prices$MSZoning)
 house_prices$Street <- factor(house_prices$Street)
@@ -114,6 +125,11 @@ house_prices <- cbind(
 Now, we add the levels for the selected factors.
 
 ```{r}
+cols <- c(
+  "OverallQual", "Neighborhood", "ExterQual", "BsmtQual", "KitchenQual",
+  "GarageFinish", "FireplaceQu", "Foundation", "GarageType", "MSSubClass"
+)
+
 levels_list <- list(
   1:10, # OverallQual
   c(
@@ -184,11 +200,6 @@ labels_list <- list(
     "PUD - MULTILEVEL - INCL SPLIT LEV/FOYER",
     "2 FAMILY CONVERSION - ALL STYLES AND AGES"
   ) # MSSubClass
-)
-
-cols <- c(
-  "OverallQual", "Neighborhood", "ExterQual", "BsmtQual", "KitchenQual",
-  "GarageFinish", "FireplaceQu", "Foundation", "GarageType", "MSSubClass"
 )
 
 house_prices[cols] <- lapply(
