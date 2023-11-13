@@ -1230,3 +1230,18 @@ house_prices[new_cols] <- lapply(
   }
 )
 ```
+
+## Interactions between categorical and numerical variables
+
+Condes() is an R function from FactoMineR which is used to describe continous by quantitative variables and/or by qualitative variables. 
+
+For quantitative variables, we observed 9 variables which showed a high correlation (Correlation > 50 & p-value around 0) with our target variable (SalePrice). These variables are : GrLivArea, GarageCars, GarageArea, TotalBsmtSF, X1stFlrSF, FullBath, TotRmsAbvGrd, YearBuilt & YearRemodAdd. Apparently, the house garages play an important role when determining the sale price. Also the size of the ground living area shows high significance in describing SalePrice. The age of the house (YearBuilt) and the remodelling (YearRemodAdd) is important to the target variable. On the other hand, we observed two variables which were negatively correlated with our target variable (EnclosedPorch & KitchenAbvGr).  
+
+For qualitative variables, two main features showed a high correlation with our target variable (R2 > 0.5 & p-value~0), which are OverallQuali (R2 = 0.68 & p-value = 0) and Neighborhood (R2 = 0.54 & p-value ~ 0). The quality of the materials used to build the house is sigificantly important to determine the SalePrice. Neighborhood showed less correlation with SalePrice, but appeared to be an important factor to determine the SalePrice. Here we did not observe any factor with negative correlation to our target. 
+```{r}
+res.con <- condes(house_prices, num.var = 35)
+# Assessing the description of the num variable by the quantitative variables
+res.con$quanti
+# Assessing the description of the num variable by the quantitative variables
+res.con$quali
+```
