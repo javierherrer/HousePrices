@@ -217,7 +217,6 @@ house_prices[cols] <- lapply(
 *variable 1: LotFrontage*
 
 LotFrontage is a numerical variable with 259 NA's.  Then we used a histogram and a Boxplot to visualize the distribution of the values of this variable. By using a Shapiro test we observed a non-normal distribution for LotFrontage (p-value near 0). Afterwards, we computed the InterQuartileRange to build the thresholds for severe outliers. 88 outliers were observed, from which 12 were severe outliers.
-
 ```{r}
 summary(house_prices$LotFrontage)
 # Histogram plotting
@@ -444,9 +443,11 @@ length(which(house_prices$BsmtUnfSF < sev_down))
 
 *variable 9: TotalBsmtSF*
 
-TotalBsmtSF is a numerical variable with no missing values.  Then we used a histogram and a Boxplot to visualize the distribution of the values of this variable. By using a Shapiro test we observed a non-normal distribution for TotalBsmtSF (p-value < 2.2e-16). Afterwards, we computed the InterQuartileRange to build the thresholds for severe outliers. 61 outliers were observed,from which 5 of them were severe outliers. 
+TotalBsmtSF is a numerical variable with no missing values. We first verified the coherence between the other Basement area information variables. Then we used a histogram and a Boxplot to visualize the distribution of the values of this variable. By using a Shapiro test we observed a non-normal distribution for TotalBsmtSF (p-value < 2.2e-16). Afterwards, we computed the InterQuartileRange to build the thresholds for severe outliers. 61 outliers were observed,from which 5 of them were severe outliers. 
 ```{r}
 summary(house_prices$TotalBsmtSF)
+
+ll <- which(house_prices$BsmtFinSF1 + house_prices$BsmtFinSF2 + house_prices$BsmtUnfSF != house_prices$TotalBsmtSF);ll
 # Histogram plotting
 hist(house_prices$TotalBsmtSF,
      main = "Total square feet of basement area",
@@ -1140,15 +1141,31 @@ sum(is.na(house_prices$MSSubClass))
 
 ### Missing Imputation
 
-Missing imputation after or before Multivariate Outliers????
-Garage year built --> 81 NA's that correspond to houses with no garage, how can we impute them?
+We have three variables with missing values (GarageYrBlt, LotFrontage, MasVnrArea). 
+- GarageYrBlt has 81 NAs, which correspond to the 81 houses with no garage. Thus, it is impossible to impute a value for these missings. We thought of assigning a sentinel value as 0 to these missing values, but this could affect the imputation of the other variables' missing values. As the correlation between the variables GarageYrBlt and YearBuilt is significantly high (0.83), and the correlation test returns a near-null p-value, we decided to delete the variable.
+- For the other two variables, the missing values are random, so we decided to use the imputePCA algorithm for imputation. We observed that the imputations haven't changed the dataset significantly.
+```{r}
+#GarageYrBlt
+ll <- which(is.na(house_prices$GarageYrBlt));ll
+testdf <- house_prices[-ll,]
+cor.test(testdf$YearBuilt, testdf$GarageYrBlt)
+house_prices <- subset(house_prices, select = -GarageYrBlt)
+#LotFrontage, MasVnrArea
+# library(mice)
+# res.imp <- mice(house_prices) # Imputation for both quantitative and qualitative variables
+# summary(complete(res.imp))
+res.pca<-imputePCA(house_prices[,c(2:14,24:34)])  # Imputation for numeric variables only
+summary(res.pca$completeObs)
+house_prices$LotFrontage <- res.pca$completeObs[,1]
+house_prices$MasVnrArea <- res.pca$completeObs[,5]
+```
 
 ### Multivariate Outliers
 
-Moutlier is applied on some numerical variables to find multivariate outliers. We chose the variables that don't return a singular matrix. A very mild threshold of 0.25% is chosen as significance level because it already returns a significant amount of outliers, more exactly around 3% of instances. It is chosen to delete these outliers from the data set for the rest of the project.
+Moutlier is applied on some numerical variables to find multivariate outliers. We chose the variables that don't return a singular matrix. A very mild threshold of 0.15% is chosen as significance level because it already returns a significant amount of outliers, more exactly around 3% of instances. It is chosen to delete these outliers from the data set for the rest of the project.
 
 ```{r}
-res.out = Moutlier(house_prices[,c(3,4,7,10,14,25,27,33,35)], quantile = 0.9975, col="blue")
+res.out = Moutlier(house_prices[,c(2,3,4,7,10,14,24,26,32,34)], quantile = 0.9985, col="blue")
 which((res.out$md > res.out$cutoff)&(res.out$rd > res.out$cutoff))
 length(which((res.out$md > res.out$cutoff)&(res.out$rd > res.out$cutoff)) )/1460
 
