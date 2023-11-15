@@ -955,7 +955,7 @@ length(which(house_prices$YrSold > sev_up))
 
 *variable 34: SalePrice*
 
-This is a continuous ratio variable. The data is not normally distributed, which is confirmed by the near-null p-value of the shapiro normallity test, but this fact is further answered in .......... It contains no missing values thus imputation is not needed. The variable contains 61 outliers (out of which 12 severe), all on the higher end of the spectrum.
+This is a continuous ratio variable. The data is not normally distributed, which is confirmed by the near-null p-value of the shapiro normallity test, but this fact is further answered. It contains no missing values thus imputation is not needed. The variable contains 61 outliers (out of which 12 severe), all on the higher end of the spectrum.
 ```{r}
 summary(house_prices$SalePrice)
 # Plotting
@@ -1142,7 +1142,7 @@ sum(is.na(house_prices$MSSubClass))
 ### Missing Imputation
 
 We have three variables with missing values (GarageYrBlt, LotFrontage, MasVnrArea). 
-- GarageYrBlt has 81 NAs, which correspond to the 81 houses with no garage. Thus, it is impossible to impute a value for these missings. We thought of assigning a sentinel value as 0 to these missing values, but this could affect the imputation of the other variables' missing values. As the correlation between the variables GarageYrBlt and YearBuilt is significantly high (0.83), and the correlation test returns a near-null p-value, we decided to delete the variable.
+- GarageYrBlt has 81 NAs, which correspond to the 81 houses with no garage. Thus, it is impossible to impute a value for these missings. We thought of assigning a sentinel value as 0 to these missing values, but this could affect the imputation of the other variables' missing values. As the correlation between the variables GarageYrBlt and YearBuilt is significantly high (0.83, indicating multicollinearity), and the correlation test returns a near-null p-value, we decided to delete the variable.
 - For the other two variables, the missing values are random, so we decided to use the imputePCA algorithm for imputation. We observed that the imputations haven't changed the dataset significantly.
 ```{r}
 #GarageYrBlt
@@ -1160,10 +1160,78 @@ house_prices$LotFrontage <- res.pca$completeObs[,1]
 house_prices$MasVnrArea <- res.pca$completeObs[,5]
 ```
 
+### Observed relations
+
+Strong Positive Correlations among Features (> 0.45):
+ - X1stFlrSF and TotalBsmtSF (0.83)
+ - LotFrontage and LotArea (0.60)
+ - YearBuilt and GarageArea (0.54)
+ - GrLivArea and X1stFlrSF (0.47)
+ - GrLivArea and X2ndFlrSF (0.64)
+ - GarageArea and X1stFlrSF (0.48)
+Negative Correlations among Features (< -0.40):
+ - BsmtUnfSF and BsmtFinSF1 (-0.58)
+ - EnclosedPorch and YearBuilt (-0.41)
+```{r}
+cor(house_prices[,c(2:14,24:34)],method="spearman")
+```
+
+### Univariate Outliers
+
+Now the individuals are investigated. First the number of univariate outliers per individual are counted and added in a new variable called ‘univ_outl_count’. Looking at the 2 individuals with the most univariate outliers (>= 8) it can be concluded that they are all houses with a big living area and large LotArea. A correlation matrix confirms this as it shows a positive correlation to GrLiveArea, X1stFlrSF and LotArea.
+```{r}
+house_prices$univ_outl_count <- 0
+house_prices$univ_outl_count[Boxplot(house_prices$LotFrontage, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$LotFrontage, id = list(n=Inf))] + 1
+house_prices$univ_outl_count[Boxplot(house_prices$LotArea, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$LotArea, id = list(n=Inf))] + 1
+
+house_prices$univ_outl_count[Boxplot(house_prices$YearBuilt, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$YearBuilt, id = list(n=Inf))] + 1
+
+house_prices$univ_outl_count[Boxplot(house_prices$MasVnrArea, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$MasVnrArea, id = list(n=Inf))] + 1
+
+house_prices$univ_outl_count[Boxplot(house_prices$BsmtFinSF1, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$BsmtFinSF1, id = list(n=Inf))] + 1
+
+house_prices$univ_outl_count[Boxplot(house_prices$BsmtFinSF2, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$BsmtFinSF2, id = list(n=Inf))] + 1
+
+house_prices$univ_outl_count[Boxplot(house_prices$BsmtUnfSF, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$BsmtUnfSF, id = list(n=Inf))] + 1
+
+house_prices$univ_outl_count[Boxplot(house_prices$TotalBsmtSF, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$TotalBsmtSF, id = list(n=Inf))] + 1
+
+house_prices$univ_outl_count[Boxplot(house_prices$X1stFlrSF, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$X1stFlrSF, id = list(n=Inf))] + 1
+
+house_prices$univ_outl_count[Boxplot(house_prices$X2ndFlrSF, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$X2ndFlrSF, id = list(n=Inf))] + 1
+
+house_prices$univ_outl_count[Boxplot(house_prices$LowQualFinSF, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$LowQualFinSF, id = list(n=Inf))] + 1
+
+house_prices$univ_outl_count[Boxplot(house_prices$GrLivArea, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$GrLivArea, id = list(n=Inf))] + 1
+
+house_prices$univ_outl_count[Boxplot(house_prices$GarageArea, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$GarageArea, id = list(n=Inf))] + 1
+
+house_prices$univ_outl_count[Boxplot(house_prices$WoodDeckSF, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$WoodDeckSF, id = list(n=Inf))] + 1
+
+house_prices$univ_outl_count[Boxplot(house_prices$OpenPorchSF, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$OpenPorchSF, id = list(n=Inf))] + 1
+
+house_prices$univ_outl_count[Boxplot(house_prices$EnclosedPorch, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$EnclosedPorch, id = list(n=Inf))] + 1
+
+house_prices$univ_outl_count[Boxplot(house_prices$X3SsnPorch, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$X3SsnPorch, id = list(n=Inf))] + 1
+
+house_prices$univ_outl_count[Boxplot(house_prices$ScreenPorch, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$ScreenPorch, id = list(n=Inf))] + 1
+
+house_prices$univ_outl_count[Boxplot(house_prices$PoolArea, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$PoolArea, id = list(n=Inf))] + 1
+
+max(house_prices$univ_outl_count)
+
+house_prices[which(house_prices$univ_outl_count >= 8),]
+
+df_of_interest = house_prices[,c(3,11,27,30,10,14,34,45)]
+cor_outl = cor(df_of_interest)
+require(corrplot)
+par(mfrow=c(1,1))
+corrplot(cor_outl, method = 'number')
+```
+
 ### Multivariate Outliers
 
 Moutlier is applied on some numerical variables to find multivariate outliers. We chose the variables that don't return a singular matrix. A very mild threshold of 0.15% is chosen as significance level because it already returns a significant amount of outliers, more exactly around 3% of instances. It is chosen to delete these outliers from the data set for the rest of the project.
-
 ```{r}
 res.out = Moutlier(house_prices[,c(2,3,4,7,10,14,24,26,32,34)], quantile = 0.9985, col="blue")
 which((res.out$md > res.out$cutoff)&(res.out$rd > res.out$cutoff))
@@ -1259,7 +1327,7 @@ house_prices[new_cols] <- lapply(
 )
 ```
 
-## Interactions between categorical and numerical variables
+### Interactions between categorical and numerical variables
 
 Condes() is an R function from FactoMineR which is used to describe continous by quantitative variables and/or by qualitative variables. 
 
@@ -1267,7 +1335,7 @@ For quantitative variables, we observed 9 variables which showed a high correlat
 
 For qualitative variables, two main features showed a high correlation with our target variable (R2 > 0.5 & p-value~0), which are OverallQuali (R2 = 0.68 & p-value = 0) and Neighborhood (R2 = 0.54 & p-value ~ 0). The quality of the materials used to build the house is sigificantly important to determine the SalePrice. Neighborhood showed less correlation with SalePrice, but appeared to be an important factor to determine the SalePrice. Here we did not observe any factor with negative correlation to our target. 
 ```{r}
-res.con <- condes(house_prices, num.var = 35)
+res.con <- condes(house_prices, num.var = 34)
 # Assessing the description of the num variable by the quantitative variables
 res.con$quanti
 # Assessing the description of the num variable by the quantitative variables
