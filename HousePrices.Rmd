@@ -1331,13 +1331,110 @@ house_prices[new_cols] <- lapply(
 
 Condes() is an R function from FactoMineR which is used to describe continous by quantitative variables and/or by qualitative variables. 
 
-For quantitative variables, we observed 9 variables which showed a high correlation (Correlation > 50 & p-value around 0) with our target variable (SalePrice). These variables are : GrLivArea, GarageCars, GarageArea, TotalBsmtSF, X1stFlrSF, FullBath, TotRmsAbvGrd, YearBuilt & YearRemodAdd. Apparently, the house garages play an important role when determining the sale price. Also the size of the ground living area shows high significance in describing SalePrice. The age of the house (YearBuilt) and the remodelling (YearRemodAdd) is important to the target variable. On the other hand, we observed two variables which were negatively correlated with our target variable (EnclosedPorch & KitchenAbvGr).  
+For quantitative variables, we observed 9 variables which showed a high correlation (Correlation > 50 & p-value around 0) with our target variable (SalePrice). These variables are : GrLivArea, GarageCars, GarageArea, TotalBsmtSF, X1stFlrSF, FullBath, TotRmsAbvGrd, YearBuilt & YearRemodAdd. Apparently, the house garages play an important role when determining the sale price. Also the size of the ground living area shows high significance in describing SalePrice. The age of the house (YearBuilt) and the remodelling (YearRemodAdd) is important to the target variable. On the other hand, we observed three variables which were negatively correlated with our target variable (EnclosedPorch, KitchenAbvGr & LowQualiFinSF).  
 
-For qualitative variables, two main features showed a high correlation with our target variable (R2 > 0.5 & p-value~0), which are OverallQuali (R2 = 0.68 & p-value = 0) and Neighborhood (R2 = 0.54 & p-value ~ 0). The quality of the materials used to build the house is sigificantly important to determine the SalePrice. Neighborhood showed less correlation with SalePrice, but appeared to be an important factor to determine the SalePrice. Here we did not observe any factor with negative correlation to our target. 
+For qualitative variables, threee main features showed a high correlation with our target variable (R2 > 0.5 & p-value~0), which are OverallQuali (R2 = 0.70 & p-value = 0), Neighborhood (R2 = 0.58 & p-value ~ 0) and ExterQual (R2 = 0.50 & p-value ~ 0). The quality of the materials used to build the house is sigificantly important to determine the SalePrice. Neighborhood showed less correlation with SalePrice, but appeared to be an important factor to determine the SalePrice. Here we did not observe any factor with negative correlation to our target. 
 ```{r}
 res.con <- condes(house_prices, num.var = 34)
 # Assessing the description of the num variable by the quantitative variables
 res.con$quanti
 # Assessing the description of the num variable by the quantitative variables
 res.con$quali
+```
+
+### Model building
+
+We initially built a model using only the numerical variables of our dataset. Here we observed that some of these variables presented NA's in the model (TotalBsmtSF, GrLivArea), meaning that we had multicollinearity in our model. To identify which variables had perfect correlation with each other in our dataset, we used cor() function. We identified that TotalBsmtSF had a very high correlation with X1stFlrSF (0.79) and GrLivArea was very correlated with TotRmsAbvGrd (0.82), so we decided to exclude them from our model. We also excluded Id and univ_outl_count because they were either non-informative or were created artificially to perform a given section of the project (univ_outl_count).
+
+We created the second model with all these conditions described above. The linear regression model (m2) was fitted to predict the sale price (SalePrice) again. The model's intercept was not statistically significant (p = 0.35334), suggesting that the predicted sale price is not significantly different from zero when all other predictors are zero. Among the predictor variables, several were statistically significant with positive or negative coefficients. For instance, variables such as "YearBuilt," "YearRemodAdd," "BsmtFinSF1," "X1stFlrSF," and "X2ndFlrSF" had positive coefficients, indicating a positive relationship with sale price. On the other hand, variables like "BedroomAbvGr" and "KitchenAbvGr" had negative coefficients, suggesting a negative impact on sale price. The overall model explained a substantial portion of the variability in sale prices (Adjusted R-squared = 0.8391), and the F-statistic was highly significant (p < 2.2e-16), indicating that at least one of the predictors was significantly related to the sale price. However, we observed that some of the predictors were not statistically significant, so we performed a Stepwise (step()) to remove them.
+By using step we were able to select a formula-based model by AIC. Here we were able to discard FullBath, MiscVal, YrSold, X3SsnPorch, BsmtFullBath, LowQualFinSF, PoolArea and BsmtHalfBath.
+
+Afterwards we created a new model with the output model produced by step. In this model, we did observe a statistical significance for the intercept, suggesting a statistical significance from zero when the other predictors are zero. Almost all predictors showed a high significance in this model, so we kept all of them. At this point we attempted to incorporate categorical variables to our model. 
+
+As a last step to create our model, we introduced all our categorical variables to the model and we run again step() to remove non-significant predictors. Here we discarded FireplaceQu, f.LotFrontage, f.LotArea, GarageFinish, MoSold, TotRmsAbvGrd, BsmtHalfBath, HalfBath, EnclosedPorch, LotFrontage, GarageType and Foundation. 
+
+```{r}
+numeric_variables <- sapply(house_prices, is.numeric)
+m1 <- lm(SalePrice ~. ,data = house_prices[,numeric_variables])
+
+summary(m1) # As we observe that TotalBsmtSF and GrLivArea are NA in the linear model, meaning that there's multicollinearity
+
+# To check correlation between variables we apply cor()
+variab <- cor(house_prices[,numeric_variables])
+
+# Creating other model without these variables
+excluded <- c("Id","TotalBsmtSF", "GrLivArea","univ_outl_count")
+selected <- numeric_variables & !names(numeric_variables) %in% excluded
+m2 <- lm(SalePrice ~. ,data = house_prices[,selected])
+summary(m2)
+
+# Now excluding no significant predictors
+step(m2)
+
+# Model with the subselection of variables
+m3 <- lm(formula = SalePrice ~ LotFrontage + LotArea + YearBuilt + 
+    YearRemodAdd + MasVnrArea + BsmtFinSF1 + BsmtFinSF2 + BsmtUnfSF + 
+    X1stFlrSF + X2ndFlrSF + BsmtHalfBath + HalfBath + BedroomAbvGr + 
+    KitchenAbvGr + TotRmsAbvGrd + Fireplaces + GarageCars + GarageArea + 
+    WoodDeckSF + OpenPorchSF + EnclosedPorch + ScreenPorch + 
+    MoSold, data = house_prices[, selected])
+summary(m3)
+
+# Adding categorical variables
+factors <- sapply(house_prices, is.factor)
+total <- factors + selected
+m4 <- lm(formula = SalePrice ~ LotFrontage + LotArea + YearBuilt + 
+    YearRemodAdd + MasVnrArea + BsmtFinSF1 + BsmtFinSF2 + BsmtUnfSF + 
+    X1stFlrSF + X2ndFlrSF + BsmtHalfBath + HalfBath + BedroomAbvGr + 
+    KitchenAbvGr + TotRmsAbvGrd + Fireplaces + GarageCars + GarageArea + 
+    WoodDeckSF + OpenPorchSF + EnclosedPorch + ScreenPorch + 
+    MoSold + OverallQual+ Neighborhood + ExterQual + BsmtQual + KitchenQual + GarageFinish +
+    FireplaceQu+ Foundation + GarageType + MSSubClass + f.LotFrontage + f.LotArea +
+    f.YearBuilt, data = house_prices[, total == 1])
+
+summary(m4)
+step(m4)
+
+# Final model
+m5 <- lm(formula = SalePrice ~ LotArea + YearBuilt + YearRemodAdd + 
+    MasVnrArea + BsmtFinSF1 + BsmtFinSF2 + BsmtUnfSF + X1stFlrSF + 
+    X2ndFlrSF + BedroomAbvGr + KitchenAbvGr + Fireplaces + GarageCars + 
+    GarageArea + WoodDeckSF + OpenPorchSF + ScreenPorch + OverallQual + 
+    Neighborhood + ExterQual + BsmtQual + KitchenQual + GarageType + 
+    MSSubClass + f.YearBuilt, data = house_prices[, total == 
+    1])
+
+summary(m5)
+```
+
+### Model validation
+
+We used different approaches to validate if our model was correct or not. First of all we run diagnostic plots to our model using plot(). By looking into the Residuals vs Fitted plot, we observed homoscedasticity between residuals and fitted values (horizontal band), meaning that the variance of the residuals is constant across all levels of the independent variables. On the other hand, by looking into the Normal Q-Q plot, we observed that the residuals do not follow a complete normal distribution, as the ones in the 3 and -3 quantiles deviate from the straight line.
+Then we visualized the influence of each observation on the fitted values and residuals of our model. Here we observed that 689 and 1325 had a high influence on our residuals. Afterwards we plotted for each predictor of the model the response versus our data. We observed for every predictor homoscedasticity. We then used residualPlots() to plot residuals vs fitted for each predictor of our model. Again, we observed homoscedasticity. To assess the fit and assumptions of our regression model we used crPlots(). We observed linearity for all our predictors in our model. Finally, we used boxcox() to transform the response variable  to a power of lambda, where lambda is a parameter that is determined such that the transformed variable follows a normal distribution. 
+```{r}
+# Diagnostic plots for our model
+par(mfrow = c(2,2))
+plot(m5, id.n = 0)
+par(mfrow=c(1,1))
+
+# Influential data
+influencePlot(m5, id = list(n=0)) 
+
+# Marginal model plots
+marginalModelPlots(m5, id = list(n=0))
+
+# Residual plots
+residualPlots(m5, id = list(n=0))
+
+# Component residual plots
+crPlots(m5, id = list(n=0))
+
+# Boxcox
+boxcox(SalePrice ~ LotArea + YearBuilt + YearRemodAdd + 
+    MasVnrArea + BsmtFinSF1 + BsmtFinSF2 + BsmtUnfSF + X1stFlrSF + 
+    X2ndFlrSF + BedroomAbvGr + KitchenAbvGr + Fireplaces + GarageCars + 
+    GarageArea + WoodDeckSF + OpenPorchSF + ScreenPorch + OverallQual + 
+    Neighborhood + ExterQual + BsmtQual + KitchenQual + GarageType + 
+    MSSubClass + f.YearBuilt, data = house_prices[, total == 
+    1])
 ```
