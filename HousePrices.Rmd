@@ -714,13 +714,15 @@ Boxplot(house_prices$GarageYrBlt, id = list(n=Inf))
 This is a discrete quantitative variable, with only 5 values. It contains no missing values thus imputation is not needed. The variable contains 5 outliers (out of which 0 severe), all on the higher end of the spectrum.
 ```{r}
 summary(house_prices$GarageCars)
-house_prices$GarageCars <- as.factor(house_prices$GarageCars)
 # Plotting
 barplot(table(house_prices$GarageCars), 
      xlab = "Number of Cars",
      ylab = "Density",
      main = "Garage Size by Car Capacity")
 
+length(Boxplot(house_prices$GarageCars, id = list(n=Inf)))
+sev_up = (quantile(house_prices$GarageCars,0.75)+(3*((quantile(house_prices$GarageCars,0.75)-quantile(house_prices$GarageCars,0.25)))))
+length(which(house_prices$GarageCars > sev_up))
 #Missing values
 sum(is.na(house_prices$GarageCars))
 ```
@@ -1163,6 +1165,7 @@ house_prices$MasVnrArea <- res.pca$completeObs[,5]
 ### Observed relations
 
 Strong Positive Correlations among Features (> 0.45):
+ - GarageCars and GarageArea (0.85)
  - X1stFlrSF and TotalBsmtSF (0.83)
  - LotFrontage and LotArea (0.60)
  - YearBuilt and GarageArea (0.54)
@@ -1173,7 +1176,7 @@ Negative Correlations among Features (< -0.40):
  - BsmtUnfSF and BsmtFinSF1 (-0.58)
  - EnclosedPorch and YearBuilt (-0.41)
 ```{r}
-cor(house_prices[,c(2:14,24:34)],method="spearman")
+cor(house_prices[,c(2:14,23:34)],method="spearman")
 ```
 
 ### Univariate Outliers
@@ -1203,6 +1206,8 @@ house_prices$univ_outl_count[Boxplot(house_prices$X2ndFlrSF, id = list(n=Inf))] 
 house_prices$univ_outl_count[Boxplot(house_prices$LowQualFinSF, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$LowQualFinSF, id = list(n=Inf))] + 1
 
 house_prices$univ_outl_count[Boxplot(house_prices$GrLivArea, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$GrLivArea, id = list(n=Inf))] + 1
+
+house_prices$univ_outl_count[Boxplot(house_prices$GarageCars, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$GarageCars, id = list(n=Inf))] + 1
 
 house_prices$univ_outl_count[Boxplot(house_prices$GarageArea, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$GarageArea, id = list(n=Inf))] + 1
 
@@ -1329,11 +1334,11 @@ house_prices[new_cols] <- lapply(
 
 ### Interactions between categorical and numerical variables
 
-Condes() is an R function from FactoMineR which is used to describe continous by quantitative variables and/or by qualitative variables. 
+Condes() is an R function from FactoMineR which is used to describe continuous by quantitative variables and/or by qualitative variables. 
 
 For quantitative variables, we observed 9 variables which showed a high correlation (Correlation > 50 & p-value around 0) with our target variable (SalePrice). These variables are : GrLivArea, GarageCars, GarageArea, TotalBsmtSF, X1stFlrSF, FullBath, TotRmsAbvGrd, YearBuilt & YearRemodAdd. Apparently, the house garages play an important role when determining the sale price. Also the size of the ground living area shows high significance in describing SalePrice. The age of the house (YearBuilt) and the remodelling (YearRemodAdd) is important to the target variable. On the other hand, we observed three variables which were negatively correlated with our target variable (EnclosedPorch, KitchenAbvGr & LowQualiFinSF).  
 
-For qualitative variables, threee main features showed a high correlation with our target variable (R2 > 0.5 & p-value~0), which are OverallQuali (R2 = 0.70 & p-value = 0), Neighborhood (R2 = 0.58 & p-value ~ 0) and ExterQual (R2 = 0.50 & p-value ~ 0). The quality of the materials used to build the house is sigificantly important to determine the SalePrice. Neighborhood showed less correlation with SalePrice, but appeared to be an important factor to determine the SalePrice. Here we did not observe any factor with negative correlation to our target. 
+For qualitative variables, three main features explained the most the variance in our target variable (R2 > 0.5 & p-value~0), which are OverallQual (R2 = 0.70 & p-value = 0), Neighborhood (R2 = 0.59 & p-value ~ 0) and ExterQual (R2 = 0.51 & p-value ~ 0). This is to be expected, as the quality of the materials used to build the house is significantly important to determine the SalePrice. The Neighborhood also explained most of the variance of the SalePrice, as expected. KitchenAbvGr, BedroomAbvGr, BsmtFullBath and HalfBath are poorly associated as they have R2-values under 10%.
 ```{r}
 res.con <- condes(house_prices, num.var = 34)
 # Assessing the description of the num variable by the quantitative variables
@@ -1342,9 +1347,64 @@ res.con$quanti
 res.con$quali
 ```
 
-### Model building
+## Model building
 
-We initially built a model using only the numerical variables of our dataset. Here we observed that some of these variables presented NA's in the model (TotalBsmtSF, GrLivArea), meaning that we had multicollinearity in our model. To identify which variables had perfect correlation with each other in our dataset, we used cor() function. We identified that TotalBsmtSF had a very high correlation with X1stFlrSF (0.79) and GrLivArea was very correlated with TotRmsAbvGrd (0.82), so we decided to exclude them from our model. We also excluded Id and univ_outl_count because they were either non-informative or were created artificially to perform a given section of the project (univ_outl_count).
+### Multicollinearity on the model
+
+First, we built a model using only the numerical variables of our dataset. To simplify our model, collinearity is investigated to see if there are variables that are redundant in our model. We can see that there are some aliased coefficients, but it seems to be related to the interaction terms between certain variables. For fixing that, we decided to exclude TotalBsmtSF and GrLivArea. The TotalBsmtSF can be obtained adding (BsmtFinSF1 + BsmtFinSF2 + BsmtUnfSF), and the GrLivArea (X1stFlrSF + X2ndFlrSF + LowQualFinSF). We also excluded Id and univ_outl_count because they were either non-informative or were created artificially to perform a given section of the project (univ_outl_count).
+
+Then we calculated the variance inflation factor. This indicates whether or not a variable correlates too much with other predictors such that it becomes redundant in the model. In general, a VIF-value larger than 1/(1-R_sq) is considered as showing too much collinear behavior. In our case, GarageCars has a value very close to the threshold as it is really correlated with the GarageArea, so we decided to exclude the GarageCars variable.
+
+To further confirm this hypothesis, models are build by alternately removing the highly correlated variables from the logarithmic model. Then, ANOVA is applied to test whether or not the models are significantly predicting something else and AIC to see what model is considered the best.
+We remember that Strong Positive Correlations among Features (> 0.45):
+ - GarageCars and GarageArea (0.85)
+ - X1stFlrSF and TotalBsmtSF (0.83)
+ - LotFrontage and LotArea (0.60)
+ - YearBuilt and GarageArea (0.54)
+ - GrLivArea and X1stFlrSF (0.47)
+ - GrLivArea and X2ndFlrSF (0.64)
+ - GarageArea and X1stFlrSF (0.48)
+ Negative Correlations among Features (< -0.40):
+ - BsmtUnfSF and BsmtFinSF1 (-0.58)
+ - EnclosedPorch and YearBuilt (-0.41)
+
+These tests show that the model with all numeric variables performs the best and that no severe collinearity is present in our model.
+
+```{r}
+numeric_variables <- sapply(house_prices, is.numeric)
+m1 <- lm(SalePrice ~. ,data = house_prices[,numeric_variables])
+summary(m1)
+alias(m1)
+# Creating another model without these variables
+excluded <- c("Id","TotalBsmtSF", "GrLivArea","univ_outl_count")
+selected <- numeric_variables & !names(numeric_variables) %in% excluded
+m2 <- lm(SalePrice ~. ,data = house_prices[,selected])
+t = summary(m2);t
+vif(m2)
+1/(1-t$r.squared)
+
+excluded <- c("Id","TotalBsmtSF", "GrLivArea","univ_outl_count", "GarageCars")
+selected <- numeric_variables & !names(numeric_variables) %in% excluded
+m3 <- lm(SalePrice ~. ,data = house_prices[,selected])
+
+excluded <- c("Id","TotalBsmtSF", "GrLivArea","univ_outl_count", "GarageCars", "LotArea")
+selected <- numeric_variables & !names(numeric_variables) %in% excluded
+m4 <- lm(SalePrice ~. ,data = house_prices[,selected])
+
+excluded <- c("Id","TotalBsmtSF", "GrLivArea","univ_outl_count", "GarageCars", "YearBuilt")
+selected <- numeric_variables & !names(numeric_variables) %in% excluded
+m5 <- lm(SalePrice ~. ,data = house_prices[,selected])
+
+excluded <- c("Id","TotalBsmtSF", "GrLivArea","univ_outl_count", "GarageCars", "BsmtUnfSF")
+selected <- numeric_variables & !names(numeric_variables) %in% excluded
+m6 <- lm(SalePrice ~. ,data = house_prices[,selected])
+
+anova(m3,m4)
+anova(m3,m5)
+anova(m3,m6)
+
+AIC(m3, m4, m5, m6)
+```
 
 We created the second model with all these conditions described above. The linear regression model (m2) was fitted to predict the sale price (SalePrice) again. The model's intercept was not statistically significant (p = 0.35334), suggesting that the predicted sale price is not significantly different from zero when all other predictors are zero. Among the predictor variables, several were statistically significant with positive or negative coefficients. For instance, variables such as "YearBuilt," "YearRemodAdd," "BsmtFinSF1," "X1stFlrSF," and "X2ndFlrSF" had positive coefficients, indicating a positive relationship with sale price. On the other hand, variables like "BedroomAbvGr" and "KitchenAbvGr" had negative coefficients, suggesting a negative impact on sale price. The overall model explained a substantial portion of the variability in sale prices (Adjusted R-squared = 0.8391), and the F-statistic was highly significant (p < 2.2e-16), indicating that at least one of the predictors was significantly related to the sale price. However, we observed that some of the predictors were not statistically significant, so we performed a Stepwise (step()) to remove them.
 By using step we were able to select a formula-based model by AIC. Here we were able to discard FullBath, MiscVal, YrSold, X3SsnPorch, BsmtFullBath, LowQualFinSF, PoolArea and BsmtHalfBath.
@@ -1354,60 +1414,47 @@ Afterwards we created a new model with the output model produced by step. In thi
 As a last step to create our model, we introduced all our categorical variables to the model and we run again step() to remove non-significant predictors. Here we discarded FireplaceQu, f.LotFrontage, f.LotArea, GarageFinish, MoSold, TotRmsAbvGrd, BsmtHalfBath, HalfBath, EnclosedPorch, LotFrontage, GarageType and Foundation. 
 
 ```{r}
-numeric_variables <- sapply(house_prices, is.numeric)
-m1 <- lm(SalePrice ~. ,data = house_prices[,numeric_variables])
-
-summary(m1) # As we observe that TotalBsmtSF and GrLivArea are NA in the linear model, meaning that there's multicollinearity
-
-# To check correlation between variables we apply cor()
-variab <- cor(house_prices[,numeric_variables])
-
-# Creating other model without these variables
-excluded <- c("Id","TotalBsmtSF", "GrLivArea","univ_outl_count")
-selected <- numeric_variables & !names(numeric_variables) %in% excluded
-m2 <- lm(SalePrice ~. ,data = house_prices[,selected])
-summary(m2)
-
+summary(m3)
 # Now excluding no significant predictors
-step(m2)
+step(m3)
 
 # Model with the subselection of variables
-m3 <- lm(formula = SalePrice ~ LotFrontage + LotArea + YearBuilt + 
-    YearRemodAdd + MasVnrArea + BsmtFinSF1 + BsmtFinSF2 + BsmtUnfSF + 
-    X1stFlrSF + X2ndFlrSF + BsmtHalfBath + HalfBath + BedroomAbvGr + 
-    KitchenAbvGr + TotRmsAbvGrd + Fireplaces + GarageCars + GarageArea + 
-    WoodDeckSF + OpenPorchSF + EnclosedPorch + ScreenPorch + 
-    MoSold, data = house_prices[, selected])
-summary(m3)
-
-# Adding categorical variables
-factors <- sapply(house_prices, is.factor)
-total <- factors + selected
-m4 <- lm(formula = SalePrice ~ LotFrontage + LotArea + YearBuilt + 
-    YearRemodAdd + MasVnrArea + BsmtFinSF1 + BsmtFinSF2 + BsmtUnfSF + 
-    X1stFlrSF + X2ndFlrSF + BsmtHalfBath + HalfBath + BedroomAbvGr + 
-    KitchenAbvGr + TotRmsAbvGrd + Fireplaces + GarageCars + GarageArea + 
-    WoodDeckSF + OpenPorchSF + EnclosedPorch + ScreenPorch + 
-    MoSold + OverallQual+ Neighborhood + ExterQual + BsmtQual + KitchenQual + GarageFinish +
-    FireplaceQu+ Foundation + GarageType + MSSubClass + f.LotFrontage + f.LotArea +
-    f.YearBuilt, data = house_prices[, total == 1])
-
-summary(m4)
-step(m4)
-
-# Final model
-m5 <- lm(formula = SalePrice ~ LotArea + YearBuilt + YearRemodAdd + 
-    MasVnrArea + BsmtFinSF1 + BsmtFinSF2 + BsmtUnfSF + X1stFlrSF + 
-    X2ndFlrSF + BedroomAbvGr + KitchenAbvGr + Fireplaces + GarageCars + 
-    GarageArea + WoodDeckSF + OpenPorchSF + ScreenPorch + OverallQual + 
-    Neighborhood + ExterQual + BsmtQual + KitchenQual + GarageType + 
-    MSSubClass + f.YearBuilt, data = house_prices[, total == 
-    1])
-
-summary(m5)
+# m3 <- lm(formula = SalePrice ~ LotFrontage + LotArea + YearBuilt + 
+#     YearRemodAdd + MasVnrArea + BsmtFinSF1 + BsmtFinSF2 + BsmtUnfSF + 
+#     X1stFlrSF + X2ndFlrSF + BsmtHalfBath + HalfBath + BedroomAbvGr + 
+#     KitchenAbvGr + TotRmsAbvGrd + Fireplaces + GarageCars + GarageArea + 
+#     WoodDeckSF + OpenPorchSF + EnclosedPorch + ScreenPorch + 
+#     MoSold, data = house_prices[, selected])
+# summary(m3)
+# 
+# # Adding categorical variables
+# factors <- sapply(house_prices, is.factor)
+# total <- factors + selected
+# m4 <- lm(formula = SalePrice ~ LotFrontage + LotArea + YearBuilt + 
+#     YearRemodAdd + MasVnrArea + BsmtFinSF1 + BsmtFinSF2 + BsmtUnfSF + 
+#     X1stFlrSF + X2ndFlrSF + BsmtHalfBath + HalfBath + BedroomAbvGr + 
+#     KitchenAbvGr + TotRmsAbvGrd + Fireplaces + GarageCars + GarageArea + 
+#     WoodDeckSF + OpenPorchSF + EnclosedPorch + ScreenPorch + 
+#     MoSold + OverallQual+ Neighborhood + ExterQual + BsmtQual + KitchenQual + GarageFinish +
+#     FireplaceQu+ Foundation + GarageType + MSSubClass + f.LotFrontage + f.LotArea +
+#     f.YearBuilt, data = house_prices[, total == 1])
+# 
+# summary(m4)
+# step(m4)
+# 
+# # Final model
+# m5 <- lm(formula = SalePrice ~ LotArea + YearBuilt + YearRemodAdd + 
+#     MasVnrArea + BsmtFinSF1 + BsmtFinSF2 + BsmtUnfSF + X1stFlrSF + 
+#     X2ndFlrSF + BedroomAbvGr + KitchenAbvGr + Fireplaces + GarageCars + 
+#     GarageArea + WoodDeckSF + OpenPorchSF + ScreenPorch + OverallQual + 
+#     Neighborhood + ExterQual + BsmtQual + KitchenQual + GarageType + 
+#     MSSubClass + f.YearBuilt, data = house_prices[, total == 
+#     1])
+# 
+# summary(m5)
 ```
 
-### Model validation
+## Model validation
 
 We used different approaches to validate if our model was correct or not. First of all we run diagnostic plots to our model using plot(). By looking into the Residuals vs Fitted plot, we observed homoscedasticity between residuals and fitted values (horizontal band), meaning that the variance of the residuals is constant across all levels of the independent variables. On the other hand, by looking into the Normal Q-Q plot, we observed that the residuals do not follow a complete normal distribution, as the ones in the 3 and -3 quantiles deviate from the straight line.
 Then we visualized the influence of each observation on the fitted values and residuals of our model. Here we observed that 689 and 1325 had a high influence on our residuals. Afterwards we plotted for each predictor of the model the response versus our data. We observed for every predictor homoscedasticity. We then used residualPlots() to plot residuals vs fitted for each predictor of our model. Again, we observed homoscedasticity. To assess the fit and assumptions of our regression model we used crPlots(). We observed linearity for all our predictors in our model. Finally, we used boxcox() to transform the response variable  to a power of lambda, where lambda is a parameter that is determined such that the transformed variable follows a normal distribution. 
@@ -1438,3 +1485,78 @@ boxcox(SalePrice ~ LotArea + YearBuilt + YearRemodAdd +
     MSSubClass + f.YearBuilt, data = house_prices[, total == 
     1])
 ```
+
+## Model testing with test samples
+
+### Load and prepare Test Data
+```{r}
+test_data <- read.csv("test.csv")
+
+#Prepare Test Data
+test_data <- test_data[c("OverallQual", "Neighborhood", "ExterQual", "GrLivArea", "GarageCars", "GarageArea", "TotalBsmtSF", "X1stFlrSF", "YearBuilt", "YearRemodAdd")]
+test_data$OverallQual <- factor(test_data$OverallQual)
+test_data$Neighborhood <- factor(test_data$Neighborhood)
+test_data$ExterQual <- factor(test_data$ExterQual)
+
+cols <- c("OverallQual", "Neighborhood", "ExterQual")
+levels_list <- list(
+  1:10, # OverallQual
+  c(
+    "Blmngtn", "Blueste", "BrDale", "BrkSide", "ClearCr", "CollgCr", "Crawfor",
+    "Edwards", "Gilbert", "IDOTRR", "MeadowV", "Mitchel", "NAmes", "NoRidge",
+    "NPkVill","NridgHt", "NWAmes", "OldTown", "SWISU", "Sawyer", "SawyerW",
+    "Somerst", "StoneBr", "Timber", "Veenker"
+  ), # Neighborhood
+  c("Ex", "Gd", "TA", "Fa", "Po") # ExterQual
+)
+labels_list <- list(
+  c(
+    "Very Poor", "Poor", "Fair", "Below Average", "Average", "Above Average",
+    "Good", "Very Good", "Excellent", "Very Excellent"
+  ), # OverallQual
+  c(
+    "Bloomington Heights", "Bluestem", "Briardale", "Brookside", "Clear Creek",
+    "College Creek", "Crawford", "Edwards", "Gilbert", "Iowa DOT and Rail Road",
+    "Meadow Village", "Mitchell", "North Ames", "Northridge", "Northpark Villa",
+    "Northridge Heights", "Northwest Ames", "Old Town",
+    "South & West of Iowa State University", "Sawyer", "Sawyer West",
+    "Somerset", "Stone Brook", "Timberland", "Veenker"
+  ), # Neighborhood
+  c("Excellent", "Good", "Average/Typical", "Fair", "Poor") # ExterQual
+)
+
+test_data[cols] <- lapply(
+  seq_along(cols),
+  function(i) {
+    factor(
+      test_data[[cols[i]]],
+      levels = levels_list[[i]],
+      labels = labels_list[[i]]
+    )
+  }
+)
+summary(test_data)
+ll_na <- which(is.na(test_data$GarageCars) | is.na(test_data$GarageArea) | is.na(test_data$TotalBsmtSF));ll_na
+#Discard observaions with NA's
+test_data <- test_data[-ll_na,]
+```
+
+### Make predictions
+```{r}
+# predictions <- predict(final_model, newdata = test_data)
+# 
+# # Assuming 'actual_values' are the true values from the test dataset
+# mse <- mean((actual_values - predictions)^2)
+# mae <- mean(abs(actual_values - predictions))
+# rsquared <- 1 - sum((actual_values - predictions)^2) / sum((actual_values - mean(actual_values))^2)
+# 
+# # Print or display the metrics
+# cat("Mean Squared Error:", mse, "\n")
+# cat("Mean Absolute Error:", mae, "\n")
+# cat("R-squared:", rsquared, "\n")
+# 
+# # Goodness of fit test H0: Model fits data
+# deviance(final_model)
+# pvalue <- 1 - pchisq(deviance(final_model),1);pvalue #I fail to reject the null hypothesis
+```
+
