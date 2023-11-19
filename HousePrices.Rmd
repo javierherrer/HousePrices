@@ -1153,9 +1153,6 @@ testdf <- house_prices[-ll,]
 cor.test(testdf$YearBuilt, testdf$GarageYrBlt)
 house_prices <- subset(house_prices, select = -GarageYrBlt)
 #LotFrontage, MasVnrArea
-# library(mice)
-# res.imp <- mice(house_prices) # Imputation for both quantitative and qualitative variables
-# summary(complete(res.imp))
 res.pca<-imputePCA(house_prices[,c(2:14,24:34)])  # Imputation for numeric variables only
 summary(res.pca$completeObs)
 house_prices$LotFrontage <- res.pca$completeObs[,1]
@@ -1164,7 +1161,7 @@ house_prices$MasVnrArea <- res.pca$completeObs[,5]
 
 ### Observed relations
 
-Strong Positive Correlations among Features (> 0.45):
+Strong Positive Correlations among Numerical Features (> 0.45):
  - GarageCars and GarageArea (0.85)
  - X1stFlrSF and TotalBsmtSF (0.83)
  - LotFrontage and LotArea (0.60)
@@ -1181,54 +1178,29 @@ cor(house_prices[,c(2:14,23:34)],method="spearman")
 
 ### Univariate Outliers
 
-Now the individuals are investigated. First the number of univariate outliers per individual are counted and added in a new variable called ‘univ_outl_count’. Looking at the 2 individuals with the most univariate outliers (>= 8) it can be concluded that they are all houses with a big living area and large LotArea. A correlation matrix confirms this as it shows a positive correlation to GrLiveArea, X1stFlrSF and LotArea.
+Now the individuals are investigated. First the number of univariate outliers per individual are counted and added in a new variable called ‘univ_outl_count’. Looking at the 2 individuals with the most univariate outliers (>= 8) it can be concluded that they are all houses with a big living area and large LotArea. A correlation matrix confirms this as it shows a positive correlation to GrLiveArea, X1stFlrSF, LotArea and BsmtFinSF2.
 ```{r}
 house_prices$univ_outl_count <- 0
-house_prices$univ_outl_count[Boxplot(house_prices$LotFrontage, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$LotFrontage, id = list(n=Inf))] + 1
-house_prices$univ_outl_count[Boxplot(house_prices$LotArea, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$LotArea, id = list(n=Inf))] + 1
-
-house_prices$univ_outl_count[Boxplot(house_prices$YearBuilt, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$YearBuilt, id = list(n=Inf))] + 1
-
-house_prices$univ_outl_count[Boxplot(house_prices$MasVnrArea, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$MasVnrArea, id = list(n=Inf))] + 1
-
-house_prices$univ_outl_count[Boxplot(house_prices$BsmtFinSF1, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$BsmtFinSF1, id = list(n=Inf))] + 1
-
-house_prices$univ_outl_count[Boxplot(house_prices$BsmtFinSF2, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$BsmtFinSF2, id = list(n=Inf))] + 1
-
-house_prices$univ_outl_count[Boxplot(house_prices$BsmtUnfSF, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$BsmtUnfSF, id = list(n=Inf))] + 1
-
-house_prices$univ_outl_count[Boxplot(house_prices$TotalBsmtSF, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$TotalBsmtSF, id = list(n=Inf))] + 1
-
-house_prices$univ_outl_count[Boxplot(house_prices$X1stFlrSF, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$X1stFlrSF, id = list(n=Inf))] + 1
-
-house_prices$univ_outl_count[Boxplot(house_prices$X2ndFlrSF, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$X2ndFlrSF, id = list(n=Inf))] + 1
-
-house_prices$univ_outl_count[Boxplot(house_prices$LowQualFinSF, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$LowQualFinSF, id = list(n=Inf))] + 1
-
-house_prices$univ_outl_count[Boxplot(house_prices$GrLivArea, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$GrLivArea, id = list(n=Inf))] + 1
-
-house_prices$univ_outl_count[Boxplot(house_prices$GarageCars, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$GarageCars, id = list(n=Inf))] + 1
-
-house_prices$univ_outl_count[Boxplot(house_prices$GarageArea, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$GarageArea, id = list(n=Inf))] + 1
-
-house_prices$univ_outl_count[Boxplot(house_prices$WoodDeckSF, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$WoodDeckSF, id = list(n=Inf))] + 1
-
-house_prices$univ_outl_count[Boxplot(house_prices$OpenPorchSF, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$OpenPorchSF, id = list(n=Inf))] + 1
-
-house_prices$univ_outl_count[Boxplot(house_prices$EnclosedPorch, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$EnclosedPorch, id = list(n=Inf))] + 1
-
-house_prices$univ_outl_count[Boxplot(house_prices$X3SsnPorch, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$X3SsnPorch, id = list(n=Inf))] + 1
-
-house_prices$univ_outl_count[Boxplot(house_prices$ScreenPorch, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$ScreenPorch, id = list(n=Inf))] + 1
-
-house_prices$univ_outl_count[Boxplot(house_prices$PoolArea, id = list(n=Inf))] = house_prices$univ_outl_count[Boxplot(house_prices$PoolArea, id = list(n=Inf))] + 1
-
+# List of numeric variables for which outliers are to be counted
+numeric_variables <- c(
+  "LotFrontage", "LotArea", "YearBuilt", "MasVnrArea", "BsmtFinSF1", 
+  "BsmtFinSF2", "BsmtUnfSF", "TotalBsmtSF", "X1stFlrSF", "X2ndFlrSF", 
+  "LowQualFinSF", "GrLivArea", "GarageCars", "GarageArea", "WoodDeckSF", 
+  "OpenPorchSF", "EnclosedPorch", "X3SsnPorch", "ScreenPorch", "PoolArea"
+)
+# Iterate through variables and update univ_outl_count
+for (variable in numeric_variables) {
+  variable_values <- house_prices[[variable]]
+  variable_stats <- boxplot.stats(variable_values)
+  outlier_indices <- which(variable_values %in% variable_stats$out)
+  
+  house_prices$univ_outl_count[outlier_indices] <- house_prices$univ_outl_count[outlier_indices] + 1
+}
 max(house_prices$univ_outl_count)
-
 house_prices[which(house_prices$univ_outl_count >= 8),]
 
-df_of_interest = house_prices[,c(3,11,27,30,10,14,34,45)]
-cor_outl = cor(df_of_interest)
+df_of_interest = house_prices[,c(3,4,8,11,27,14,34,45)]
+cor_outl = cor(df_of_interest); cor_outl
 require(corrplot)
 par(mfrow=c(1,1))
 corrplot(cor_outl, method = 'number')
@@ -1371,7 +1343,6 @@ We remember that Strong Positive Correlations among Features (> 0.45):
  - EnclosedPorch and YearBuilt (-0.41)
 
 These tests show that the model with all numeric variables performs the best and that no severe collinearity is present in our model.
-
 ```{r}
 numeric_variables <- sapply(house_prices, is.numeric)
 m1 <- lm(SalePrice ~. ,data = house_prices[,numeric_variables])
@@ -1388,17 +1359,14 @@ vif(m2)
 excluded <- c("Id","TotalBsmtSF", "GrLivArea","univ_outl_count", "GarageCars")
 selected <- numeric_variables & !names(numeric_variables) %in% excluded
 m3 <- lm(SalePrice ~. ,data = house_prices[,selected])
-summary(m3)
 
 excluded <- c("Id","TotalBsmtSF", "GrLivArea","univ_outl_count", "GarageCars", "LotArea")
 selected <- numeric_variables & !names(numeric_variables) %in% excluded
 m4 <- lm(SalePrice ~. ,data = house_prices[,selected])
-summary(m4)
 
 excluded <- c("Id","TotalBsmtSF", "GrLivArea","univ_outl_count", "GarageCars", "YearBuilt")
 selected <- numeric_variables & !names(numeric_variables) %in% excluded
 m5 <- lm(SalePrice ~. ,data = house_prices[,selected])
-summary(m5)
 
 excluded <- c("Id","TotalBsmtSF", "GrLivArea","univ_outl_count", "GarageCars", "BsmtUnfSF")
 selected <- numeric_variables & !names(numeric_variables) %in% excluded
@@ -1411,12 +1379,12 @@ anova(m3,m6)
 AIC(m3, m4, m5, m6)
 ```
 
-We created the second model with all these conditions described above, as m3 was the model with lowest AIC among all. The linear regression model (m3) was fitted to predict the sale price (SalePrice) again. The model's intercept was not statistically significant (p = 0.35334), suggesting that the predicted sale price is not significantly different from zero when all other predictors are zero. Among the predictor variables, several were statistically significant with positive or negative coefficients. For instance, variables such as "YearBuilt," "YearRemodAdd," "BsmtFinSF1," "X1stFlrSF," and "X2ndFlrSF" had positive coefficients, indicating a positive relationship with sale price. On the other hand, variables like "BedroomAbvGr" and "KitchenAbvGr" had negative coefficients, suggesting a negative impact on sale price. The overall model explained a substantial portion of the variability in sale prices (Adjusted R-squared = 0.8319), and the F-statistic was highly significant (p < 2.2e-16), indicating that at least one of the predictors was significantly related to the sale price. However, we observed that some of the predictors were not statistically significant, so we performed a Stepwise (step()) to remove them.
-By using step we were able to select a formula-based model by AIC. Here we were able to discard FullBath, MiscVal, YrSold, X3SsnPorch, BsmtFinSF2, BsmtFullBath, LowQualFinSF, PoolArea and HalfBath.
+The model's intercept was not statistically significant (p = 0.430036), suggesting that the predicted sale price is not significantly different from zero when all other predictors are zero. Among the predictor variables, several were statistically significant with positive or negative coefficients. For instance, variables such as "YearBuilt," "YearRemodAdd," "BsmtFinSF1," "X1stFlrSF," "X2ndFlrSF" and "GarageArea" had positive coefficients, indicating a positive relationship with sale price. On the other hand, the variable "YrSold" is -4.962e+02. Specifically, for each additional year the house was sold later, the SalePrice is expected to decrease by approximately 496.2 units. On average, more recent sales are associated with lower SalePrices.
+The overall model explained a substantial portion of the variability in sale prices (Adjusted R-squared = 0.8172), and the F-statistic was highly significant (p < 2.2e-16), indicating that at least one of the predictors was significantly related to the sale price. However, we observed that some of the predictors were not statistically significant, so we performed a Stepwise (step()) to remove them. By using step we were able to select a formula-based model by AIC. Here we were able to discard MiscVal, YrSold, X3SsnPorch, LowQualFinSF, PoolArea.
 
 Afterwards we created a new model with the output model produced by step. In this model, we did observe a statistical significance for the intercept, suggesting a statistical significance from zero when the other predictors are zero. Almost all predictors showed a high significance in this model, so we kept all of them. At this point we attempted to incorporate categorical variables to our model. 
 
-As a last step to create our model, we introduced all our categorical variables to the model and we run again step() to remove non-significant predictors. Here we discarded FireplaceQu, f.LotFrontage, f.LotArea, GarageFinish, MoSold, TotRmsAbvGrd, BsmtHalfBath, HalfBath, EnclosedPorch and LotFrontage. 
+As a last step to create our model, we introduced all our categorical variables to the model and we run again step() to remove non-significant predictors. Here we discarded LotFrontage, EnclosedPorch, MoSold, GarageFinish, FireplaceQu, Foundation, GarageType, f.LotFrontage, f.LotArea, BsmtFullBath, BsmtHalfBath, FullBath and TotRmsAbvGrd. 
 
 ```{r}
 excluded <- c("Id","TotalBsmtSF", "GrLivArea","univ_outl_count", "GarageCars")
@@ -1428,35 +1396,31 @@ step(m3)
 
 # Model with the subselection of variables
 m7 <- lm(formula = SalePrice ~ LotFrontage + LotArea + YearBuilt + 
-    YearRemodAdd + MasVnrArea + BsmtFinSF1 + X1stFlrSF + X2ndFlrSF + 
-    BsmtHalfBath + HalfBath + BedroomAbvGr + KitchenAbvGr + TotRmsAbvGrd + 
-    Fireplaces + GarageArea + WoodDeckSF + OpenPorchSF + EnclosedPorch + 
-    ScreenPorch + MoSold, data = house_prices[, selected])
+    YearRemodAdd + MasVnrArea + BsmtFinSF1 + BsmtFinSF2 + BsmtUnfSF + 
+    X1stFlrSF + X2ndFlrSF + GarageArea + WoodDeckSF + OpenPorchSF + 
+    EnclosedPorch + ScreenPorch + MoSold, data = house_prices)
 summary(m7)
-# 
-# Adding categorical variables
-factors <- sapply(house_prices, is.factor)
-total <- factors + selected
-m8 <- lm(formula = SalePrice ~ LotFrontage + LotArea + YearBuilt + 
-    YearRemodAdd + MasVnrArea + BsmtFinSF1 + X1stFlrSF + X2ndFlrSF + 
-    BsmtHalfBath + HalfBath + BedroomAbvGr + KitchenAbvGr + TotRmsAbvGrd + 
-    Fireplaces + GarageArea + WoodDeckSF + OpenPorchSF + EnclosedPorch + 
-    ScreenPorch + MoSold + OverallQual+ Neighborhood + ExterQual + 
-    BsmtQual + KitchenQual + GarageFinish +
-     FireplaceQu+ Foundation + GarageType + MSSubClass + f.LotFrontage + f.LotArea +
-     f.YearBuilt, data = house_prices[, total == 1])
 
+# Adding categorical variables
+m8 <- lm(formula = SalePrice ~ LotFrontage + LotArea + YearBuilt + 
+    YearRemodAdd + MasVnrArea + BsmtFinSF1 + BsmtFinSF2 + BsmtUnfSF + 
+    X1stFlrSF + X2ndFlrSF + GarageArea + WoodDeckSF + OpenPorchSF + 
+    EnclosedPorch + ScreenPorch + MoSold + ExterQual + BsmtQual + 
+    KitchenQual + GarageFinish + FireplaceQu + Foundation + 
+    GarageType + MSSubClass + Neighborhood + f.LotFrontage + 
+    f.LotArea + f.YearBuilt + OverallQual + BsmtFullBath + 
+    BsmtHalfBath + FullBath + HalfBath + BedroomAbvGr + 
+    KitchenAbvGr + TotRmsAbvGrd + Fireplaces, data = house_prices)
 summary(m8)
 step(m8)
-# 
+
 # Final model
 m9 <- lm(formula = SalePrice ~ LotArea + YearBuilt + YearRemodAdd + 
-    MasVnrArea + BsmtFinSF1 + X1stFlrSF + X2ndFlrSF + BedroomAbvGr + 
-    KitchenAbvGr + Fireplaces + GarageArea + WoodDeckSF + OpenPorchSF + 
-    ScreenPorch + OverallQual + Neighborhood + ExterQual + BsmtQual + 
-    KitchenQual + GarageType + MSSubClass + f.YearBuilt, data = house_prices[, 
-    total == 1])
- 
+    MasVnrArea + BsmtFinSF1 + BsmtFinSF2 + BsmtUnfSF + X1stFlrSF + 
+    X2ndFlrSF + GarageArea + WoodDeckSF + OpenPorchSF + ScreenPorch + 
+    ExterQual + BsmtQual + KitchenQual + MSSubClass + Neighborhood + 
+    f.YearBuilt + OverallQual + HalfBath + BedroomAbvGr + KitchenAbvGr + 
+    Fireplaces, data = house_prices)
 summary(m9)
 ```
 
