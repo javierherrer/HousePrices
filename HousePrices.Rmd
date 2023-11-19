@@ -1386,14 +1386,17 @@ vif(m2)
 excluded <- c("Id","TotalBsmtSF", "GrLivArea","univ_outl_count", "GarageCars")
 selected <- numeric_variables & !names(numeric_variables) %in% excluded
 m3 <- lm(SalePrice ~. ,data = house_prices[,selected])
+summary(m3)
 
 excluded <- c("Id","TotalBsmtSF", "GrLivArea","univ_outl_count", "GarageCars", "LotArea")
 selected <- numeric_variables & !names(numeric_variables) %in% excluded
 m4 <- lm(SalePrice ~. ,data = house_prices[,selected])
+summary(m4)
 
 excluded <- c("Id","TotalBsmtSF", "GrLivArea","univ_outl_count", "GarageCars", "YearBuilt")
 selected <- numeric_variables & !names(numeric_variables) %in% excluded
 m5 <- lm(SalePrice ~. ,data = house_prices[,selected])
+summary(m5)
 
 excluded <- c("Id","TotalBsmtSF", "GrLivArea","univ_outl_count", "GarageCars", "BsmtUnfSF")
 selected <- numeric_variables & !names(numeric_variables) %in% excluded
@@ -1406,84 +1409,86 @@ anova(m3,m6)
 AIC(m3, m4, m5, m6)
 ```
 
-We created the second model with all these conditions described above. The linear regression model (m2) was fitted to predict the sale price (SalePrice) again. The model's intercept was not statistically significant (p = 0.35334), suggesting that the predicted sale price is not significantly different from zero when all other predictors are zero. Among the predictor variables, several were statistically significant with positive or negative coefficients. For instance, variables such as "YearBuilt," "YearRemodAdd," "BsmtFinSF1," "X1stFlrSF," and "X2ndFlrSF" had positive coefficients, indicating a positive relationship with sale price. On the other hand, variables like "BedroomAbvGr" and "KitchenAbvGr" had negative coefficients, suggesting a negative impact on sale price. The overall model explained a substantial portion of the variability in sale prices (Adjusted R-squared = 0.8391), and the F-statistic was highly significant (p < 2.2e-16), indicating that at least one of the predictors was significantly related to the sale price. However, we observed that some of the predictors were not statistically significant, so we performed a Stepwise (step()) to remove them.
-By using step we were able to select a formula-based model by AIC. Here we were able to discard FullBath, MiscVal, YrSold, X3SsnPorch, BsmtFullBath, LowQualFinSF, PoolArea and BsmtHalfBath.
+We created the second model with all these conditions described above, as m3 was the model with lowest AIC among all. The linear regression model (m3) was fitted to predict the sale price (SalePrice) again. The model's intercept was not statistically significant (p = 0.35334), suggesting that the predicted sale price is not significantly different from zero when all other predictors are zero. Among the predictor variables, several were statistically significant with positive or negative coefficients. For instance, variables such as "YearBuilt," "YearRemodAdd," "BsmtFinSF1," "X1stFlrSF," and "X2ndFlrSF" had positive coefficients, indicating a positive relationship with sale price. On the other hand, variables like "BedroomAbvGr" and "KitchenAbvGr" had negative coefficients, suggesting a negative impact on sale price. The overall model explained a substantial portion of the variability in sale prices (Adjusted R-squared = 0.8319), and the F-statistic was highly significant (p < 2.2e-16), indicating that at least one of the predictors was significantly related to the sale price. However, we observed that some of the predictors were not statistically significant, so we performed a Stepwise (step()) to remove them.
+By using step we were able to select a formula-based model by AIC. Here we were able to discard FullBath, MiscVal, YrSold, X3SsnPorch, BsmtFinSF2, BsmtFullBath, LowQualFinSF, PoolArea and HalfBath.
 
 Afterwards we created a new model with the output model produced by step. In this model, we did observe a statistical significance for the intercept, suggesting a statistical significance from zero when the other predictors are zero. Almost all predictors showed a high significance in this model, so we kept all of them. At this point we attempted to incorporate categorical variables to our model. 
 
-As a last step to create our model, we introduced all our categorical variables to the model and we run again step() to remove non-significant predictors. Here we discarded FireplaceQu, f.LotFrontage, f.LotArea, GarageFinish, MoSold, TotRmsAbvGrd, BsmtHalfBath, HalfBath, EnclosedPorch, LotFrontage, GarageType and Foundation. 
+As a last step to create our model, we introduced all our categorical variables to the model and we run again step() to remove non-significant predictors. Here we discarded FireplaceQu, f.LotFrontage, f.LotArea, GarageFinish, MoSold, TotRmsAbvGrd, BsmtHalfBath, HalfBath, EnclosedPorch and LotFrontage. 
 
 ```{r}
+excluded <- c("Id","TotalBsmtSF", "GrLivArea","univ_outl_count", "GarageCars")
+selected <- numeric_variables & !names(numeric_variables) %in% excluded
+m3 <- lm(SalePrice ~. ,data = house_prices[,selected])
 summary(m3)
 # Now excluding no significant predictors
 step(m3)
 
 # Model with the subselection of variables
-# m3 <- lm(formula = SalePrice ~ LotFrontage + LotArea + YearBuilt + 
-#     YearRemodAdd + MasVnrArea + BsmtFinSF1 + BsmtFinSF2 + BsmtUnfSF + 
-#     X1stFlrSF + X2ndFlrSF + BsmtHalfBath + HalfBath + BedroomAbvGr + 
-#     KitchenAbvGr + TotRmsAbvGrd + Fireplaces + GarageCars + GarageArea + 
-#     WoodDeckSF + OpenPorchSF + EnclosedPorch + ScreenPorch + 
-#     MoSold, data = house_prices[, selected])
-# summary(m3)
+m7 <- lm(formula = SalePrice ~ LotFrontage + LotArea + YearBuilt + 
+    YearRemodAdd + MasVnrArea + BsmtFinSF1 + X1stFlrSF + X2ndFlrSF + 
+    BsmtHalfBath + HalfBath + BedroomAbvGr + KitchenAbvGr + TotRmsAbvGrd + 
+    Fireplaces + GarageArea + WoodDeckSF + OpenPorchSF + EnclosedPorch + 
+    ScreenPorch + MoSold, data = house_prices[, selected])
+summary(m7)
 # 
-# # Adding categorical variables
-# factors <- sapply(house_prices, is.factor)
-# total <- factors + selected
-# m4 <- lm(formula = SalePrice ~ LotFrontage + LotArea + YearBuilt + 
-#     YearRemodAdd + MasVnrArea + BsmtFinSF1 + BsmtFinSF2 + BsmtUnfSF + 
-#     X1stFlrSF + X2ndFlrSF + BsmtHalfBath + HalfBath + BedroomAbvGr + 
-#     KitchenAbvGr + TotRmsAbvGrd + Fireplaces + GarageCars + GarageArea + 
-#     WoodDeckSF + OpenPorchSF + EnclosedPorch + ScreenPorch + 
-#     MoSold + OverallQual+ Neighborhood + ExterQual + BsmtQual + KitchenQual + GarageFinish +
-#     FireplaceQu+ Foundation + GarageType + MSSubClass + f.LotFrontage + f.LotArea +
-#     f.YearBuilt, data = house_prices[, total == 1])
+# Adding categorical variables
+factors <- sapply(house_prices, is.factor)
+total <- factors + selected
+m8 <- lm(formula = SalePrice ~ LotFrontage + LotArea + YearBuilt + 
+    YearRemodAdd + MasVnrArea + BsmtFinSF1 + X1stFlrSF + X2ndFlrSF + 
+    BsmtHalfBath + HalfBath + BedroomAbvGr + KitchenAbvGr + TotRmsAbvGrd + 
+    Fireplaces + GarageArea + WoodDeckSF + OpenPorchSF + EnclosedPorch + 
+    ScreenPorch + MoSold + OverallQual+ Neighborhood + ExterQual + 
+    BsmtQual + KitchenQual + GarageFinish +
+     FireplaceQu+ Foundation + GarageType + MSSubClass + f.LotFrontage + f.LotArea +
+     f.YearBuilt, data = house_prices[, total == 1])
+
+summary(m8)
+step(m8)
 # 
-# summary(m4)
-# step(m4)
-# 
-# # Final model
-# m5 <- lm(formula = SalePrice ~ LotArea + YearBuilt + YearRemodAdd + 
-#     MasVnrArea + BsmtFinSF1 + BsmtFinSF2 + BsmtUnfSF + X1stFlrSF + 
-#     X2ndFlrSF + BedroomAbvGr + KitchenAbvGr + Fireplaces + GarageCars + 
-#     GarageArea + WoodDeckSF + OpenPorchSF + ScreenPorch + OverallQual + 
-#     Neighborhood + ExterQual + BsmtQual + KitchenQual + GarageType + 
-#     MSSubClass + f.YearBuilt, data = house_prices[, total == 
-#     1])
-# 
-# summary(m5)
+# Final model
+m9 <- lm(formula = SalePrice ~ LotArea + YearBuilt + YearRemodAdd + 
+    MasVnrArea + BsmtFinSF1 + X1stFlrSF + X2ndFlrSF + BedroomAbvGr + 
+    KitchenAbvGr + Fireplaces + GarageArea + WoodDeckSF + OpenPorchSF + 
+    ScreenPorch + OverallQual + Neighborhood + ExterQual + BsmtQual + 
+    KitchenQual + GarageType + MSSubClass + f.YearBuilt, data = house_prices[, 
+    total == 1])
+ 
+summary(m9)
 ```
 
 ## Model validation
 
 We used different approaches to validate if our model was correct or not. First of all we run diagnostic plots to our model using plot(). By looking into the Residuals vs Fitted plot, we observed homoscedasticity between residuals and fitted values (horizontal band), meaning that the variance of the residuals is constant across all levels of the independent variables. On the other hand, by looking into the Normal Q-Q plot, we observed that the residuals do not follow a complete normal distribution, as the ones in the 3 and -3 quantiles deviate from the straight line.
-Then we visualized the influence of each observation on the fitted values and residuals of our model. Here we observed that 689 and 1325 had a high influence on our residuals. Afterwards we plotted for each predictor of the model the response versus our data. We observed for every predictor homoscedasticity. We then used residualPlots() to plot residuals vs fitted for each predictor of our model. Again, we observed homoscedasticity. To assess the fit and assumptions of our regression model we used crPlots(). We observed linearity for all our predictors in our model. Finally, we used boxcox() to transform the response variable  to a power of lambda, where lambda is a parameter that is determined such that the transformed variable follows a normal distribution. 
+Then we visualized the influence of each observation on the fitted values and residuals of our model. Here we observed that 1182, 1325 and 534 had a high influence on our residuals. Afterwards we plotted for each predictor of the model the response versus our data. We observed for every predictor homoscedasticity. We then used residualPlots() to plot residuals vs fitted for each predictor of our model. Again, we observed homoscedasticity. To assess the fit and assumptions of our regression model we used crPlots(). We observed linearity for all our predictors in our model. Finally, we used boxcox() to transform the response variable  to a power of lambda, where lambda is a parameter that is determined such that the transformed variable follows a normal distribution. 
+
 ```{r}
+library(MASS)
 # Diagnostic plots for our model
 par(mfrow = c(2,2))
-plot(m5, id.n = 0)
+plot(m9, id.n = 0)
 par(mfrow=c(1,1))
 
 # Influential data
-influencePlot(m5, id = list(n=0)) 
+influencePlot(m9, id = list(n=0)) 
 
 # Marginal model plots
-marginalModelPlots(m5, id = list(n=0))
+marginalModelPlots(m9, id = list(n=0))
 
 # Residual plots
-residualPlots(m5, id = list(n=0))
+residualPlots(m9, id = list(n=0))
 
 # Component residual plots
-crPlots(m5, id = list(n=0))
+crPlots(m9, id = list(n=0))
 
 # Boxcox
 boxcox(SalePrice ~ LotArea + YearBuilt + YearRemodAdd + 
-    MasVnrArea + BsmtFinSF1 + BsmtFinSF2 + BsmtUnfSF + X1stFlrSF + 
-    X2ndFlrSF + BedroomAbvGr + KitchenAbvGr + Fireplaces + GarageCars + 
-    GarageArea + WoodDeckSF + OpenPorchSF + ScreenPorch + OverallQual + 
-    Neighborhood + ExterQual + BsmtQual + KitchenQual + GarageType + 
-    MSSubClass + f.YearBuilt, data = house_prices[, total == 
-    1])
+    MasVnrArea + BsmtFinSF1 + X1stFlrSF + X2ndFlrSF + BedroomAbvGr + 
+    KitchenAbvGr + Fireplaces + GarageArea + WoodDeckSF + OpenPorchSF + 
+    ScreenPorch + OverallQual + Neighborhood + ExterQual + BsmtQual + 
+    KitchenQual + GarageType + MSSubClass + f.YearBuilt, data = house_prices[, 
+    total == 1])
 ```
 
 ## Model testing with test samples
