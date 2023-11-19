@@ -34,7 +34,7 @@ house_prices <- read.csv("train.csv")
 par(mfrow = c(1, 1))
 ```
 
-## Data preparation
+# Data preparation
 
 First, the training data was imported through the `read.csv` function.
 
@@ -218,7 +218,7 @@ house_prices[cols] <- lapply(
 ```
 
 
-###  Variable Analysis
+##  Variable Analysis
 
 *variable 1: LotFrontage*
 
@@ -860,9 +860,9 @@ prop.table(table(house_prices$MSSubClass))
 sum(is.na(house_prices$MSSubClass))
 ```
 
-## Data quality report
+# Data quality report
 
-### Missing Imputation
+## Missing Imputation
 
 We have three variables with missing values (GarageYrBlt, LotFrontage, MasVnrArea). 
 - GarageYrBlt has 81 NAs, which correspond to the 81 houses with no garage. Thus, it is impossible to impute a value for these missings. We thought of assigning a sentinel value as 0 to these missing values, but this could affect the imputation of the other variables' missing values. As the correlation between the variables GarageYrBlt and YearBuilt is significantly high (0.83, indicating multicollinearity), and the correlation test returns a near-null p-value, we decided to delete the variable.
@@ -880,7 +880,7 @@ house_prices$LotFrontage <- res.pca$completeObs[, 1]
 house_prices$MasVnrArea <- res.pca$completeObs[, 5]
 ```
 
-### Observed relations
+## Observed relations
 
 Strong Positive Correlations among Numerical Features (> 0.45):
  - GarageCars and GarageArea (0.85)
@@ -897,7 +897,7 @@ Negative Correlations among Features (< -0.40):
 # cor(house_prices[, c(2:14, 23:34)], method = "spearman")
 ```
 
-### Univariate Outliers
+## Univariate Outliers
 
 Now the individuals are investigated. First the number of univariate outliers per individual are counted and added in a new variable called ‘univ_outl_count’. Looking at the 2 individuals with the most univariate outliers (>= 8) it can be concluded that they are all houses with a big living area and large LotArea. A correlation matrix confirms this as it shows a positive correlation to GrLiveArea, X1stFlrSF, LotArea and BsmtFinSF2.
 ```{r out.width="50%"}
@@ -927,7 +927,7 @@ par(mfrow = c(1, 1))
 corrplot(cor_outl, method = "number")
 ```
 
-### Multivariate Outliers
+## Multivariate Outliers
 
 Moutlier is applied on some numerical variables to find multivariate outliers. We chose the variables that don't return a singular matrix. A very mild threshold of 0.15% is chosen as significance level because it already returns a significant amount of outliers, more exactly around 3% of instances. It is chosen to delete these outliers from the data set for the rest of the project.
 ```{r out.width="50%"}
@@ -945,9 +945,9 @@ abline(v = res.out$cutoff, col = "red")
 house_prices <- house_prices[-which((res.out$md > res.out$cutoff) & (res.out$rd > res.out$cutoff)), ]
 ```
 
-## Profiling
+# Profiling
 
-### Determine if the response variable (price) has an acceptably normal distribution. Address test to discard serial correlation.
+## Determine if the response variable (price) has an acceptably normal distribution. Address test to discard serial correlation.
 
 The acf function in R plots the autocorrelation function of a time series, which measures the linear dependence of the series with itself at different lags.
 From this acf plot, we can conclude that the `SalePrice` variable does not exhibit any strong or consistent autocorrelation at different lags, and thus it is likely to be a random or stationary time series.
@@ -985,7 +985,7 @@ shapiro.test(house_prices$SalePrice)
 )
 ```
 
-### Categorize numeric variables.
+## Categorize numeric variables.
 
 Following the initial analysis on the numeric variables, these 3 columns have been categorized:
 
@@ -1027,7 +1027,7 @@ house_prices[new_cols] <- lapply(
 )
 ```
 
-### Interactions between categorical and numerical variables
+## Interactions between categorical and numerical variables
 
 Condes() is an R function from FactoMineR which is used to describe continuous by quantitative variables and/or by qualitative variables. 
 
@@ -1042,11 +1042,11 @@ res.con$quanti
 res.con$quali
 ```
 
-## Price Modelling
+# Price Modelling
 
-### Model building
+## Model building
 
-### Multicollinearity on the model
+## Multicollinearity on the model
 
 First, we built a model using only the numerical variables of our dataset. To simplify our model, collinearity is investigated to see if there are variables that are redundant in our model. We can see that there are some aliased coefficients, but it seems to be related to the interaction terms between certain variables. For fixing that, we decided to exclude TotalBsmtSF and GrLivArea. The TotalBsmtSF can be obtained adding (BsmtFinSF1 + BsmtFinSF2 + BsmtUnfSF), and the GrLivArea (X1stFlrSF + X2ndFlrSF + LowQualFinSF). We also excluded Id and univ_outl_count because they were either non-informative or were created artificially to perform a given section of the project (univ_outl_count).
 
@@ -1147,7 +1147,7 @@ m9 <- lm(formula = SalePrice ~ LotArea + YearBuilt + YearRemodAdd +
 # summary(m9)
 ```
 
-## Model validation
+# Model validation
 
 We used different approaches to validate if our model was correct or not. First of all we run diagnostic plots to our model using plot(). By looking into the Residuals vs Fitted plot, we observed homoscedasticity between residuals and fitted values (horizontal band), meaning that the variance of the residuals is constant across all levels of the independent variables. On the other hand, by looking into the Normal Q-Q plot, we observed that the residuals do not follow a complete normal distribution, as the ones in the 3 and -3 quantiles deviate from the straight line.
 Then we visualized the influence of each observation on the fitted values and residuals of our model. Here we observed that 1182, 1325 and 534 had a high influence on our residuals. Afterwards we plotted for each predictor of the model the response versus our data. We observed for every predictor homoscedasticity. We then used residualPlots() to plot residuals vs fitted for each predictor of our model. Again, we observed homoscedasticity. To assess the fit and assumptions of our regression model we used crPlots(). We observed linearity for all our predictors in our model. Finally, we used boxcox() to transform the response variable  to a power of lambda, where lambda is a parameter that is determined such that the transformed variable follows a normal distribution. 
@@ -1187,7 +1187,7 @@ boxcox(SalePrice ~ LotArea + YearBuilt + YearRemodAdd +
 ```
 
 
-## Residual outliers
+# Residual outliers
 
 The analysis shows that there are 16 residual outliers in the best model, which are the observations that have studentized residuals outside the 99% confidence interval. These outliers are shown in red in the boxplot, the residual plot, and the Cook's distance plot. The Cook's distance measures the influence of each observation on the fitted model, and the outliers have relatively high values, indicating that they have a large impact on the model. The summary of the outliers' data frame shows that these outliers have some extreme values or unusual combinations of the predictor variables.
 
@@ -1249,7 +1249,7 @@ res_outliers <- res_outliers[, c(".rownames", ".fitted", ".resid", "SalePrice", 
 print(res_outliers)
 ```
 
-## A priori influential data observations
+# A priori influential data observations
 
 The `influencePlot` function is used to create a plot of studentized residuals vs. hat values, identifying the observations with high leverage or high residuals.
 
@@ -1269,7 +1269,7 @@ priori_influential <- row.names(high_leverage[
 priori_influential
 ```
 
-## A posteriori influential data observations
+# A posteriori influential data observations
 
 The `dfbetas` function calculates the standardized difference in each parameter estimate with and without each observation, and it can be used to assess the effect of an individual observation on each estimated parameter of the fitted model. A large `dfbeta` value indicates that the observation has a large influence on the corresponding parameter estimate.
 
@@ -1346,9 +1346,9 @@ plot(new_model)
 par(mfrow = c(1, 1))
 ```
 
-## Model testing with test samples
+# Model testing with test samples
 
-### Load and prepare Test Data
+## Load and prepare Test Data
 
 We prepared the test data by retaining only the variables that were used in the model. Upon analysis, we observed the emergence of new levels in MSSubClass, Neighborhood, OverallQual, BedroomAbvGr, and Fireplaces, which were not present in the training dataset. Given that these levels represented only a small number of values, we opted to either eliminate them or combine them with another level, as our model is not equipped to handle them. Additionally, we removed three instances with missing values from GarageArea, BsmtUnfSF, BsmtFinSF1, KitchenQual, BsmtFinSF2, and MasVnrArea, in an effort to potentially mitigate bias introduced by imputation. Finally, we performed imputation on the missing values in MasVnrArea, following the same approach as we did with the training dataset.
 ```{r out.width="50%"}
@@ -1495,7 +1495,7 @@ test_data$MasVnrArea <- res.pca$completeObs[, 4]
 # summary(test_data)
 ```
 
-### Make predictions
+## Make predictions
 
 Observing the test dataset, we noticed that the SalePrice variable was not provided. Consequently, we were unable to calculate the accuracy of our prediction. Nevertheless, the interactions between the categorical and numerical variables with the predicted variable closely resemble those in the training dataset.
 Furthermore, for having a test dataset with the actual target variable, we decided to divide our train dataset into two datasets with the `caret` package. We trained our model again with this new split data, and then validated the model with the new test dataset. The interpretations of the obtained results are the following ones.
