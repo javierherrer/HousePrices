@@ -1626,10 +1626,11 @@ reduced_data <- house_prices[!large_df, ]
 new_model <- lm(
   formula = (
     SalePrice ~ LotArea + YearBuilt + YearRemodAdd +
-      MasVnrArea + BsmtFinSF1 + X1stFlrSF + X2ndFlrSF + BedroomAbvGr +
-      KitchenAbvGr + Fireplaces + GarageArea + WoodDeckSF + OpenPorchSF +
-      ScreenPorch + OverallQual + Neighborhood + ExterQual + BsmtQual +
-      KitchenQual + GarageType + MSSubClass + f.YearBuilt
+    MasVnrArea + BsmtFinSF1 + BsmtFinSF2 + BsmtUnfSF + X1stFlrSF +
+    X2ndFlrSF + GarageArea + WoodDeckSF + OpenPorchSF + ScreenPorch +
+    ExterQual + BsmtQual + KitchenQual + MSSubClass + Neighborhood +
+    f.YearBuilt + OverallQual + HalfBath + BedroomAbvGr + KitchenAbvGr +
+    Fireplaces
   ),
   data = reduced_data
 )
