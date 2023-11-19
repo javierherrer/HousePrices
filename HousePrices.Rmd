@@ -1,15 +1,21 @@
 ---
 title: "House Prices"
-# TODO: Añadid vuestro nombres
 author: "Javier Herrer Torres, Marc Fortó Cornella, Max Ticó Miñarro"
 date: "`r Sys.Date()`"
-output: 
-  pdf_document: 
-    toc: true
+output:
+  pdf_document:
+    toc: yes
     toc_depth: 3
-    number_sections: true
-editor_options: 
+    number_sections: yes
+  word_document:
+    toc: yes
+    toc_depth: '3'
+editor_options:
   chunk_output_type: console
+geometry: left=0.4cm,right=0.4cm,top=0.6cm,bottom=0.5cm
+fontsize: 6pt
+subtitle: 'SIM - Assignment 1'
+classoption: a4paper
 ---
 
 ```{r setup, include=FALSE}
@@ -22,7 +28,7 @@ library(FactoMineR)
 library(chemometrics)
 ```
 
-```{r}
+```{r out.width="50%"}
 rm(list = ls())
 house_prices <- read.csv("train.csv")
 par(mfrow = c(1, 1))
@@ -47,7 +53,7 @@ The selected factors are:
 1. garage location,
 1. type of dwelling involved in the sale.
 
-```{r}
+```{r out.width="50%"}
 library(tidyr)
 
 na_factor_cols <- c("BsmtQual", "GarageFinish", "FireplaceQu", "GarageType")
@@ -106,7 +112,7 @@ house_prices$SaleType <- factor(house_prices$SaleType)
 house_prices$SaleCondition <- factor(house_prices$SaleCondition)
 
 continuos_description <- condes(house_prices, 81)
-continuos_description$quali
+# continuos_description$quali
 
 relevant_factors <- rownames(continuos_description$quali[1:10, ])
 relevant_factors
@@ -120,7 +126,7 @@ house_prices <- cbind(
 
 Now, we add the levels for the selected factors.
 
-```{r}
+```{r out.width="50%"}
 cols <- c(
   "OverallQual", "Neighborhood", "ExterQual", "BsmtQual", "KitchenQual",
   "GarageFinish", "FireplaceQu", "Foundation", "GarageType", "MSSubClass"
@@ -217,14 +223,14 @@ house_prices[cols] <- lapply(
 *variable 1: LotFrontage*
 
 LotFrontage is a numerical variable with 259 NA's.  Then we used a histogram and a Boxplot to visualize the distribution of the values of this variable. By using a Shapiro test we observed a non-normal distribution for LotFrontage (p-value near 0). Afterwards, we computed the InterQuartileRange to build the thresholds for severe outliers. 88 outliers were observed, from which 12 were severe outliers.
-```{r}
+```{r out.width="50%"}
 summary(house_prices$LotFrontage)
 # Histogram plotting
-hist(house_prices$LotFrontage,
-  main = "Linear feet of street connected to property",
-  xlab = "Number of feet",
-  ylab = "Frequency"
-)
+# hist(house_prices$LotFrontage,
+#   main = "Linear feet of street connected to property",
+#   xlab = "Number of feet",
+#   ylab = "Frequency"
+# )
 
 # Missing values
 sum(is.na(house_prices$LotFrontage))
@@ -246,15 +252,15 @@ length(which(house_prices$LotFrontage > sev_up)) + length(which(house_prices$Lot
 *variable 2: LotArea*
 
 LotArea is a numerical variable with 0 NA's.  Then we used a histogram and a Boxplot to visualize the distribution of the values of this variable. By using a Shapiro test we observed a non-normal distribution for LotArea (p-value < 2.2e-16). Afterwards, we computed the InterQuartileRange to build the thresholds for severe outliers. 68 outliers were observed,from which 34 were severe outliers. 
-```{r}
+```{r out.width="50%"}
 summary(house_prices$LotArea)
 # Histogram plotting
-hist(house_prices$LotArea,
-  main = "Lot size in square feet",
-  xlab = "Number of feet",
-  ylab = "Density",
-  freq = F
-)
+# hist(house_prices$LotArea,
+#   main = "Lot size in square feet",
+#   xlab = "Number of feet",
+#   ylab = "Density",
+#   freq = F
+# )
 
 # Missing values
 sum(is.na(house_prices$LotArea))
@@ -264,29 +270,28 @@ shapiro.test(house_prices$LotArea)
 
 # Univariant Outliers
 length(Boxplot(house_prices$LotArea, id = list(n = Inf)))
-Boxplot(house_prices$LotArea, id = list(n = Inf))
+# Boxplot(house_prices$LotArea, id = list(n = Inf))
 sev_up <- (quantile(house_prices$LotArea, 0.75) + (3 * ((quantile(house_prices$LotArea, 0.75) - quantile(house_prices$LotArea, 0.25)))))
 sev_down <- (quantile(house_prices$LotArea, 0.25) - (3 * ((quantile(house_prices$LotArea, 0.75) - quantile(house_prices$LotArea, 0.25)))))
 length(which(house_prices$LotArea > sev_up))
 length(which(house_prices$LotArea < sev_down))
 
 ll <- house_prices[which(house_prices$LotArea > sev_up), ]
-ll
 ```
 
 *variable 3: YearBuilt*
 
 YearBuilt is a numeric interval variable. By using a Shapiro test we observed a non-normal distribution for YearBuilt (p-value < 2.2e-16). Afterwards, we computed the InterQuartileRange to build the thresholds for severe outliers. 7 outliers were observed,from which 0 were severe outliers. 
-```{r}
+```{r out.width="50%"}
 summary(house_prices$YearBuilt)
 # Histogram plotting
-hist(house_prices$YearBuilt,
-  main = "year of construction",
-  xlab = "Year",
-  ylab = "Density",
-  freq = F
-)
-curve(dnorm(x, mean(house_prices$YearBuilt), sd(house_prices$YearBuilt)), add = TRUE, col = "red")
+# hist(house_prices$YearBuilt,
+#   main = "year of construction",
+#   xlab = "Year",
+#   ylab = "Density",
+#   freq = F
+# )
+# curve(dnorm(x, mean(house_prices$YearBuilt), sd(house_prices$YearBuilt)), add = TRUE, col = "red")
 
 # Missing values
 sum(is.na(house_prices$YearBuilt))
@@ -296,7 +301,7 @@ shapiro.test(house_prices$YearBuilt)
 
 # Univariant Outliers
 length(Boxplot(house_prices$YearBuilt, id = list(n = Inf)))
-Boxplot(house_prices$YearBuilt, id = list(n = Inf))
+# Boxplot(house_prices$YearBuilt, id = list(n = Inf))
 sev_down <- (quantile(house_prices$YearBuilt, 0.25) - (3 * ((quantile(house_prices$YearBuilt, 0.75) - quantile(house_prices$YearBuilt, 0.25)))))
 length(which(house_prices$YearBuilt < sev_down))
 ```
@@ -304,16 +309,16 @@ length(which(house_prices$YearBuilt < sev_down))
 *variable 4: YearRemodAdd*
 
 YearRemodAdd is a numeric interval variable with 0 NA's. By using a Shapiro test we observed a non-normal distribution for YearRemodAdd (p-value < 2.2e-16). We did not observe any outlier for this variable. 
-```{r}
+```{r out.width="50%"}
 summary(house_prices$YearRemodAdd)
 # Histogram plotting
-hist(house_prices$YearRemodAdd,
-  main = "Remodel year",
-  xlab = "Year",
-  ylab = "Density",
-  freq = F
-)
-curve(dnorm(x, mean(house_prices$YearRemodAdd), sd(house_prices$YearRemodAdd)), add = TRUE, col = "red")
+# hist(house_prices$YearRemodAdd,
+#   main = "Remodel year",
+#   xlab = "Year",
+#   ylab = "Density",
+#   freq = F
+# )
+# curve(dnorm(x, mean(house_prices$YearRemodAdd), sd(house_prices$YearRemodAdd)), add = TRUE, col = "red")
 
 # Missing values
 sum(is.na(house_prices$YearRemodAdd))
@@ -323,21 +328,21 @@ shapiro.test(house_prices$YearRemodAdd)
 
 # Univariant Outliers
 length(Boxplot(house_prices$YearRemodAdd, id = list(n = Inf)))
-Boxplot(house_prices$YearRemodAdd, id = list(n = Inf))
+# Boxplot(house_prices$YearRemodAdd, id = list(n = Inf))
 ```
 
 *variable 5: MasVnrArea*
 
 MasVnrArea is a numerical variable with 8 NA's.  Then we used a histogram and a Boxplot to visualize the distribution of the values of this variable. By using a Shapiro test we observed a non-normal distribution for MasVnrArea (p-value < 2.2e-16). Afterwards, we computed the InterQuartileRange to build the thresholds for severe outliers. 68 outliers were observed,from which 34 were severe outliers. 
-```{r}
+```{r out.width="50%"}
 summary(house_prices$MasVnrArea)
 # Histogram plotting
-hist(house_prices$MasVnrArea,
-  main = "Masonry veneer area in square feet",
-  xlab = "Square feet",
-  ylab = "Density",
-  freq = T
-)
+# hist(house_prices$MasVnrArea,
+#   main = "Masonry veneer area in square feet",
+#   xlab = "Square feet",
+#   ylab = "Density",
+#   freq = T
+# )
 
 # Missing values
 sum(is.na(house_prices$MasVnrArea))
@@ -347,7 +352,7 @@ shapiro.test(house_prices$MasVnrArea)
 
 # Univariant Outliers
 length(Boxplot(house_prices$MasVnrArea, id = list(n = Inf)))
-Boxplot(house_prices$MasVnrArea, id = list(n = Inf))
+# Boxplot(house_prices$MasVnrArea, id = list(n = Inf))
 varout <- summary(house_prices$MasVnrArea)
 iqr <- varout[5] - varout[2]
 sev_up <- varout[5] + 3 * iqr
@@ -360,17 +365,17 @@ length(which(house_prices$MasVnrArea > sev_up)) + length(which(house_prices$MasV
 *variable 6: BsmtFinSF1*
 
 BsmtFinSF1 is a numerical variable. We observed that some values contained 0 values, but we decided not to declare them as NA, because they corresponded to BsmtFinSF2. In total, we had no NA's. Then we used a histogram and a Boxplot to visualize the distribution of the values of this variable. By using a Shapiro test we observed a non-normal distribution for BsmtFinSF1 (p-value < 2.2e-16). Afterwards, we computed the InterQuartileRange to build the thresholds for severe outliers. 13 outliers were observed, from which only 1 was a severe outlier. 
-```{r}
+```{r out.width="50%"}
 summary(house_prices$BsmtFinSF1)
 
 # Histogram plotting
-hist(house_prices$BsmtFinSF1,
-  main = "Type 1 finished_square_feet",
-  xlab = "Square feet",
-  ylab = "Density",
-  freq = F
-)
-curve(dnorm(x, mean(house_prices$BsmtFinSF1), sd(house_prices$BsmtFinSF1)), add = TRUE, col = "red")
+# hist(house_prices$BsmtFinSF1,
+#   main = "Type 1 finished_square_feet",
+#   xlab = "Square feet",
+#   ylab = "Density",
+#   freq = F
+# )
+# curve(dnorm(x, mean(house_prices$BsmtFinSF1), sd(house_prices$BsmtFinSF1)), add = TRUE, col = "red")
 
 # Missing values
 sum(is.na(house_prices$BsmtFinSF1))
@@ -379,7 +384,7 @@ sum(is.na(house_prices$BsmtFinSF1))
 shapiro.test(house_prices$BsmtFinSF1)
 
 # Univariant Outliers
-length(Boxplot(house_prices$BsmtFinSF1, id = list(n = Inf)))
+# length(Boxplot(house_prices$BsmtFinSF1, id = list(n = Inf)))
 varout <- summary(house_prices$BsmtFinSF1)
 iqr <- varout[5] - varout[2]
 sev_up <- varout[5] + 3 * iqr
@@ -392,17 +397,17 @@ length(which(house_prices$BsmtFinSF1 > sev_up)) + length(which(house_prices$Bsmt
 *variable 7: BsmtFinSF2*
 
 BsmtFinSF2 is a numerical variable. We observed that some values contained 0 values, so we declared them as missing data. In total, we had 467 NA's. Then we used a histogram and a Boxplot to visualize the distribution of the values of this variable. By using a Shapiro test we observed a non-normal distribution for BsmtFinSF1 (p-value < 2.2e-16). We observed so many outliers (167), but they corresponded to those rows which had BsmtFinSF1. 
-```{r}
+```{r out.width="50%"}
 summary(house_prices$BsmtFinSF2)
 
 # Histogram plotting
-hist(house_prices$BsmtFinSF2,
-  main = "Type 2 finished_square_feet",
-  xlab = "Square feet",
-  ylab = "Density",
-  freq = F
-)
-curve(dnorm(x, mean(house_prices$BsmtFinSF2), sd(house_prices$BsmtFinSF2)), add = TRUE, col = "red")
+# hist(house_prices$BsmtFinSF2,
+#   main = "Type 2 finished_square_feet",
+#   xlab = "Square feet",
+#   ylab = "Density",
+#   freq = F
+# )
+# curve(dnorm(x, mean(house_prices$BsmtFinSF2), sd(house_prices$BsmtFinSF2)), add = TRUE, col = "red")
 
 # Missing values
 sum(is.na(house_prices$BsmtFinSF2))
@@ -411,7 +416,7 @@ sum(is.na(house_prices$BsmtFinSF2))
 shapiro.test(house_prices$BsmtFinSF2)
 
 # Univariant Outliers
-length(Boxplot(house_prices$BsmtFinSF2, id = list(n = Inf)))
+# length(Boxplot(house_prices$BsmtFinSF2, id = list(n = Inf)))
 varout <- summary(house_prices$BsmtFinSF2)
 iqr <- varout[5] - varout[2]
 sev_up <- varout[5] + 3 * iqr
@@ -423,107 +428,53 @@ length(which(house_prices$BsmtFinSF2 > sev_up)) + length(which(house_prices$Bsmt
 
 *variable 8: BsmtUnfSF*
 
-BsmtUnfSF is a numerical variable with 0 NA's.  Then we used a histogram and a Boxplot to visualize the distribution of the values of this variable. By using a Shapiro test we observed a non-normal distribution for BsmtUnfSF (p-value < 2.2e-16). Afterwards, we computed the InterQuartileRange to build the thresholds for severe outliers. 29 outliers were observed,from which none of them were severe outliers. 
-```{r}
+BsmtUnfSF is a numerical variable with 0 NA's. Then we used a histogram and a Boxplot to visualize the distribution of the values of this variable. By using a Shapiro test we observed a non-normal distribution for BsmtUnfSF (p-value < 2.2e-16). Afterwards, we computed the InterQuartileRange to build the thresholds for severe outliers. 29 outliers were observed,from which none of them were severe outliers. 
+```{r out.width="50%"}
 summary(house_prices$BsmtUnfSF)
-# Histogram plotting
-hist(house_prices$BsmtUnfSF,
-  main = "Unfinished square feet of basement area",
-  xlab = "Square feet",
-  ylab = "Density",
-  freq = F
-)
-curve(dnorm(x, mean(house_prices$BsmtUnfSF), sd(house_prices$BsmtUnfSF)), add = TRUE, col = "red")
 
 # Missing values
 sum(is.na(house_prices$BsmtUnfSF))
 
 # Checking for normal distribution
 shapiro.test(house_prices$BsmtUnfSF)
-
-# Univariant Outliers
-length(Boxplot(house_prices$BsmtUnfSF, id = list(n = Inf)))
-Boxplot(house_prices$BsmtUnfSF, id = list(n = Inf))
-sev_up <- (quantile(house_prices$BsmtUnfSF, 0.75) + (3 * ((quantile(house_prices$BsmtUnfSF, 0.75) - quantile(house_prices$BsmtUnfSF, 0.25)))))
-sev_down <- (quantile(house_prices$BsmtUnfSF, 0.25) - (3 * ((quantile(house_prices$BsmtUnfSF, 0.75) - quantile(house_prices$BsmtUnfSF, 0.25)))))
-length(which(house_prices$BsmtUnfSF > sev_up))
-length(which(house_prices$BsmtUnfSF < sev_down))
 ```
 
 *variable 9: TotalBsmtSF*
 
 TotalBsmtSF is a numerical variable with no missing values. We first verified the coherence between the other Basement area information variables. Then we used a histogram and a Boxplot to visualize the distribution of the values of this variable. By using a Shapiro test we observed a non-normal distribution for TotalBsmtSF (p-value < 2.2e-16). Afterwards, we computed the InterQuartileRange to build the thresholds for severe outliers. 61 outliers were observed,from which 5 of them were severe outliers. 
-```{r}
+```{r out.width="50%"}
 summary(house_prices$TotalBsmtSF)
 
 ll <- which(house_prices$BsmtFinSF1 + house_prices$BsmtFinSF2 + house_prices$BsmtUnfSF != house_prices$TotalBsmtSF)
 ll
-# Histogram plotting
-hist(house_prices$TotalBsmtSF,
-  main = "Total square feet of basement area",
-  xlab = "Square feet",
-  ylab = "Density",
-  freq = F
-)
-curve(dnorm(x, mean(house_prices$TotalBsmtSF), sd(house_prices$TotalBsmtSF)), add = TRUE, col = "red")
 
 # Missing values
 sum(is.na(house_prices$TotalBsmtSF))
 
 # Checking for normal distribution
 shapiro.test(house_prices$TotalBsmtSF)
-
-# Univariant Outliers
-length(Boxplot(house_prices$TotalBsmtSF, id = list(n = Inf)))
-Boxplot(house_prices$TotalBsmtSF, id = list(n = Inf))
-sev_up <- (quantile(house_prices$TotalBsmtSF, 0.75) + (3 * ((quantile(house_prices$TotalBsmtSF, 0.75) - quantile(house_prices$TotalBsmtSF, 0.25)))))
-sev_down <- (quantile(house_prices$TotalBsmtSF, 0.25) - (3 * ((quantile(house_prices$TotalBsmtSF, 0.75) - quantile(house_prices$TotalBsmtSF, 0.25)))))
-length(which(house_prices$TotalBsmtSF > sev_up))
-length(which(house_prices$TotalBsmtSF < sev_down))
 ```
 
 *variable 10: X1stFlrSF*
 
 X1stFlrSF is a numerical variable with no missing values.  Then we used a histogram and a Boxplot to visualize the distribution of the values of this variable. By using a Shapiro test we observed a non-normal distribution for X1stFlrSF (p-value < 2.2e-16). Afterwards, we computed the InterQuartileRange to build the thresholds for severe outliers. 20 outliers were observed,from which 3 of them were severe outliers. 
-```{r}
+```{r out.width="50%"}
 summary(house_prices$X1stFlrSF)
 # Histogram plotting
-hist(house_prices$X1stFlrSF,
-  main = "First Floor square feet",
-  xlab = "Square feet",
-  ylab = "Density",
-  freq = F
-)
-curve(dnorm(x, mean(house_prices$X1stFlrSF), sd(house_prices$X1stFlrSF)), add = TRUE, col = "red")
+
 
 # Missing values
 sum(is.na(house_prices$X1stFlrSF))
 
 # Checking for normal distribution
 shapiro.test(house_prices$X1stFlrSF)
-
-# Univariant Outliers
-length(Boxplot(house_prices$X1stFlrSF, id = list(n = Inf)))
-Boxplot(house_prices$X1stFlrSF, id = list(n = Inf))
-sev_up <- (quantile(house_prices$X1stFlrSF, 0.75) + (3 * ((quantile(house_prices$X1stFlrSF, 0.75) - quantile(house_prices$X1stFlrSF, 0.25)))))
-sev_down <- (quantile(house_prices$X1stFlrSF, 0.25) - (3 * ((quantile(house_prices$X1stFlrSF, 0.75) - quantile(house_prices$X1stFlrSF, 0.25)))))
-length(which(house_prices$X1stFlrSF > sev_up))
-length(which(house_prices$X1stFlrSF < sev_down))
 ```
 
 *variable 11: X2ndFlrSF*
 
 X2ndFlrSF is a numerical variable with no missing values. 0 correspond to houses which do not have second floor. Then we used a histogram and a Boxplot to visualize the distribution of the values of this variable. By using a Shapiro test we observed a non-normal distribution for X2ndFlrSF (p-value < 2.2e-16). Afterwards, we computed the InterQuartileRange to build the thresholds for severe outliers. 2 outliers were observed,from which none of them were severe outliers. 
-```{r}
+```{r out.width="50%"}
 summary(house_prices$X2ndFlrSF)
-# Histogram plotting
-hist(house_prices$X2ndFlrSF,
-  main = "Second Floor square feet",
-  xlab = "Square feet",
-  ylab = "Density",
-  freq = F
-)
-curve(dnorm(x, mean(house_prices$X2ndFlrSF), sd(house_prices$X2ndFlrSF)), add = TRUE, col = "red")
 
 # Missing values
 sum(is.na(house_prices$X2ndFlrSF))
@@ -533,7 +484,7 @@ shapiro.test(house_prices$X2ndFlrSF)
 
 # Univariant Outliers
 length(Boxplot(house_prices$X2ndFlrSF, id = list(n = Inf)))
-Boxplot(house_prices$X2ndFlrSF, id = list(n = Inf))
+# Boxplot(house_prices$X2ndFlrSF, id = list(n = Inf))
 sev_up <- (quantile(house_prices$X2ndFlrSF, 0.75) + (3 * ((quantile(house_prices$X2ndFlrSF, 0.75) - quantile(house_prices$X2ndFlrSF, 0.25)))))
 sev_down <- (quantile(house_prices$X2ndFlrSF, 0.25) - (3 * ((quantile(house_prices$X2ndFlrSF, 0.75) - quantile(house_prices$X2ndFlrSF, 0.25)))))
 length(which(house_prices$X2ndFlrSF > sev_up))
@@ -543,69 +494,35 @@ length(which(house_prices$X2ndFlrSF < sev_down))
 *variable 12: LowQualFinSF*
 
 LowQualFinSF is a numerical variable with no missing values. 0 correspond to houses with high quality of finished square feet. Then we used a histogram and a Boxplot to visualize the distribution of the values of this variable. By using a Shapiro test we observed a non-normal distribution for LowQualFinSF (p-value < 2.2e-16). 26 outliers were observed, all of them were the rows which had values (the rest were 0).
-```{r}
+```{r out.width="50%"}
 summary(house_prices$LowQualFinSF)
-# Histogram plotting
-hist(house_prices$LowQualFinSF,
-  main = "Low quality finished square feet",
-  xlab = "Square feet",
-  ylab = "Density",
-  freq = F
-)
-curve(dnorm(x, mean(house_prices$LowQualFinSF), sd(house_prices$LowQualFinSF)), add = TRUE, col = "red")
 
 # Missing values
 sum(is.na(house_prices$LowQualFinSF))
 
 # Checking for normal distribution
 shapiro.test(house_prices$LowQualFinSF)
-
-# Univariant Outliers
-length(Boxplot(house_prices$LowQualFinSF, id = list(n = Inf)))
-Boxplot(house_prices$LowQualFinSF, id = list(n = Inf))
-sev_up <- (quantile(house_prices$LowQualFinSF, 0.75) + (3 * ((quantile(house_prices$LowQualFinSF, 0.75) - quantile(house_prices$LowQualFinSF, 0.25)))))
-sev_down <- (quantile(house_prices$LowQualFinSF, 0.25) - (3 * ((quantile(house_prices$LowQualFinSF, 0.75) - quantile(house_prices$LowQualFinSF, 0.25)))))
-length(which(house_prices$LowQualFinSF > sev_up))
-length(which(house_prices$LowQualFinSF < sev_down))
 ```
 
 *variable 13: GrLivArea*
 
 GrLivArea is a numerical variable with no missing values. Then we used a histogram and a Boxplot to visualize the distribution of the values of this variable. By using a Shapiro test we observed a non-normal distribution for GrLivArea (p-value < 2.2e-16). 31 outliers were observed, from which only 4 were observed to be severe.
-```{r}
+```{r out.width="50%"}
 summary(house_prices$GrLivArea)
-# Histogram plotting
-hist(house_prices$GrLivArea,
-  main = "Above grade (ground) living area square feet",
-  xlab = "Square feet",
-  ylab = "Density",
-  freq = F
-)
-curve(dnorm(x, mean(house_prices$GrLivArea), sd(house_prices$GrLivArea)), add = TRUE, col = "red")
 
 # Missing values
 sum(is.na(house_prices$GrLivArea))
 
 # Checking for normal distribution
 shapiro.test(house_prices$GrLivArea)
-
-# Univariant Outliers
-length(Boxplot(house_prices$GrLivArea, id = list(n = Inf)))
-Boxplot(house_prices$GrLivArea, id = list(n = Inf))
-sev_up <- (quantile(house_prices$GrLivArea, 0.75) + (3 * ((quantile(house_prices$GrLivArea, 0.75) - quantile(house_prices$GrLivArea, 0.25)))))
-sev_down <- (quantile(house_prices$GrLivArea, 0.25) - (3 * ((quantile(house_prices$GrLivArea, 0.75) - quantile(house_prices$GrLivArea, 0.25)))))
-length(which(house_prices$GrLivArea > sev_up))
-length(which(house_prices$GrLivArea < sev_down))
 ```
 
 *variable 14: BsmtFullBath*
 
 BsmtFullBath is a numerical variable but contains only 4 possible values. Here we decided to categorize it with as.factor(). Then we used a barplot to visualize the distribution of the values of this variable. No missings were observed.
-```{r}
+```{r out.width="50%"}
 summary(house_prices$BsmtFullBath)
 house_prices$BsmtFullBath <- as.factor(house_prices$BsmtFullBath)
-# Histogram plotting
-barplot(table(house_prices$BsmtFullBath), xlab = "Number of Basement Full Bathrooms", ylab = "Frequency", main = "Basement full bathrooms")
 
 # Missing values
 sum(is.na(house_prices$BsmtFullBath))
@@ -614,11 +531,9 @@ sum(is.na(house_prices$BsmtFullBath))
 *variable 15: BsmtHalfBath*
 
 BsmtHalfBath is a numerical variable but contains only 3 possible values. Here we decided to categorize it with as.factor(). Then we used a barplot to visualize the distribution of the values of this variable. No missings were observed.
-```{r}
+```{r out.width="50%"}
 summary(house_prices$BsmtHalfBath)
 house_prices$BsmtHalfBath <- as.factor(house_prices$BsmtHalfBath)
-# Histogram plotting
-barplot(table(house_prices$BsmtHalfBath), xlab = "Number of Basement Half Bathrooms", ylab = "Frequency", main = "Basement half bathrooms")
 
 # Missing values
 sum(is.na(house_prices$BsmtHalfBath))
@@ -627,11 +542,9 @@ sum(is.na(house_prices$BsmtHalfBath))
 *variable 16: FullBath*
 
 FullBath is a numerical variable but contains only 4 possible values. Here we decided to categorize it with as.factor(). Then we used a barplot to visualize the distribution of the values of this variable. No missings were observed.
-```{r}
+```{r out.width="50%"}
 summary(house_prices$FullBath)
 house_prices$FullBath <- as.factor(house_prices$FullBath)
-# Histogram plotting
-barplot(table(house_prices$FullBath), xlab = "Full Bathrooms above grade", ylab = "Frequency", main = "Full Bathrooms above grade")
 
 # Missing values
 sum(is.na(house_prices$FullBath))
@@ -640,11 +553,9 @@ sum(is.na(house_prices$FullBath))
 *variable 17: HalfBath*
 
 HalfBath is a numerical variable but contains only 3 possible values. Here we decided to categorize it with as.factor(). Then we used a barplot to visualize the distribution of the values of this variable. No missings were observed.
-```{r}
+```{r out.width="50%"}
 summary(house_prices$HalfBath)
 house_prices$HalfBath <- as.factor(house_prices$HalfBath)
-# Histogram plotting
-barplot(table(house_prices$HalfBath), xlab = "Half Bathrooms above grade", ylab = "Frequency", main = "Half Bathrooms above grade")
 
 # Missing values
 sum(is.na(house_prices$HalfBath))
@@ -653,11 +564,9 @@ sum(is.na(house_prices$HalfBath))
 *variable 18: BedroomAbvGr*
 
 BedroomAbvGr is a numerical variable but contains only 9 possible values. Here we decided to categorize it with as.factor(). Then we used a barplot to visualize the distribution of the values of this variable. No missings were observed.
-```{r}
+```{r out.width="50%"}
 summary(house_prices$BedroomAbvGr)
 house_prices$BedroomAbvGr <- as.factor(house_prices$BedroomAbvGr)
-# Histogram plotting
-barplot(table(house_prices$BedroomAbvGr), xlab = "Bedrooms above grade", ylab = "Frequency", main = "Bedrooms above grade")
 
 # Missing values
 sum(is.na(house_prices$BedroomAbvGr))
@@ -666,11 +575,9 @@ sum(is.na(house_prices$BedroomAbvGr))
 *variable 19: KitchenAbvGr*
 
 KitchenAbvGr is a numerical variable but contains only 4 possible values. Here we decided to categorize it with as.factor(). Then we used a barplot to visualize the distribution of the values of this variable. No missings were observed.
-```{r}
+```{r out.width="50%"}
 summary(house_prices$KitchenAbvGr)
 house_prices$KitchenAbvGr <- as.factor(house_prices$KitchenAbvGr)
-# Histogram plotting
-barplot(table(house_prices$KitchenAbvGr), xlab = "Kitchens above grade", ylab = "Frequency", main = "Kitchens above grade")
 
 # Missing values
 sum(is.na(house_prices$KitchenAbvGr))
@@ -679,11 +586,9 @@ sum(is.na(house_prices$KitchenAbvGr))
 *variable 20: TotRmsAbvGrd*
 
 KitchenAbvGr is a numerical variable but contains only 12 possible values. Here we decided to categorize it with as.factor(). Then we used a barplot to visualize the distribution of the values of this variable. No missings were observed.
-```{r}
+```{r out.width="50%"}
 summary(house_prices$TotRmsAbvGrd)
 house_prices$TotRmsAbvGrd <- as.factor(house_prices$TotRmsAbvGrd)
-# Histogram plotting
-barplot(table(house_prices$TotRmsAbvGrd), xlab = "Total rooms above grade", ylab = "Frequency", main = "Total rooms above grade")
 
 # Missing values
 sum(is.na(house_prices$TotRmsAbvGrd))
@@ -692,11 +597,9 @@ sum(is.na(house_prices$TotRmsAbvGrd))
 *variable 21: Fireplaces*
 
 Fireplaces is a numerical variable but contains only 4 possible values. Here we decided to factorize it with as.factor(). Then we used a barplot to visualize the distribution of the values of this variable. No missings were observed.
-```{r}
+```{r out.width="50%"}
 summary(house_prices$Fireplaces)
 house_prices$Fireplaces <- as.factor(house_prices$Fireplaces)
-# Histogram plotting
-barplot(table(house_prices$Fireplaces), xlab = "Number of fireplaces", ylab = "Frequency", main = "Number of fireplaces")
 
 # Missing values
 sum(is.na(house_prices$Fireplaces))
@@ -705,41 +608,22 @@ sum(is.na(house_prices$Fireplaces))
 *variable 22: GarageYrBlt*
 
 GarageYrBlt is a numeric interval variable. It contains 81 NA's, that correspond to the houses with no garages. By using a Shapiro test we observed a non-normal distribution for YearBuilt (p-value < 2.2e-16). Afterwards, we computed the InterQuartileRange to build the thresholds for severe outliers. 0 outliers were seen in this variable.
-```{r}
+```{r out.width="50%"}
 summary(house_prices$GarageYrBlt)
-# Histogram plotting
-hist(house_prices$GarageYrBlt,
-  main = "Year garage was built",
-  xlab = "Year",
-  ylab = "Density"
-)
 
 # Missing values
 sum(is.na(house_prices$GarageYrBlt))
 
 # Checking for normal distribution
 shapiro.test(house_prices$GarageYrBlt)
-
-# Univariant Outliers
-length(Boxplot(house_prices$GarageYrBlt, id = list(n = Inf)))
-Boxplot(house_prices$GarageYrBlt, id = list(n = Inf))
 ```
 
 *variable 23: GarageCars*
 
 This is a discrete quantitative variable, with only 5 values. It contains no missing values thus imputation is not needed. The variable contains 5 outliers (out of which 0 severe), all on the higher end of the spectrum.
-```{r}
+```{r out.width="50%"}
 summary(house_prices$GarageCars)
-# Plotting
-barplot(table(house_prices$GarageCars),
-  xlab = "Number of Cars",
-  ylab = "Density",
-  main = "Garage Size by Car Capacity"
-)
 
-length(Boxplot(house_prices$GarageCars, id = list(n = Inf)))
-sev_up <- (quantile(house_prices$GarageCars, 0.75) + (3 * ((quantile(house_prices$GarageCars, 0.75) - quantile(house_prices$GarageCars, 0.25)))))
-length(which(house_prices$GarageCars > sev_up))
 # Missing values
 sum(is.na(house_prices$GarageCars))
 ```
@@ -747,266 +631,134 @@ sum(is.na(house_prices$GarageCars))
 *variable 24: GarageArea*
 
 This is a continuous ratio variable. The data is not normally distributed, which is confirmed by the near-null p-value of the shapiro normallity test. It contains no missing values thus imputation is not needed. The variable contains 21 outliers (out of which 3 severe), all on the higher end of the spectrum.
-```{r}
+```{r out.width="50%"}
 summary(house_prices$GarageArea)
-# Plotting
-hist(house_prices$GarageArea,
-  main = "Garage Size by Area in square feet",
-  xlab = "Area in square feet",
-  ylab = "Density",
-  freq = F,
-)
-curve(dnorm(x, mean(house_prices$GarageArea), sd(house_prices$GarageArea)), add = TRUE, col = "red")
+
 shapiro.test(house_prices$GarageArea)
 # Missing values
 sum(is.na(house_prices$GarageArea))
-
-# Univariant Outliers
-length(Boxplot(house_prices$GarageArea, id = list(n = Inf)))
-sev_up <- (quantile(house_prices$GarageArea, 0.75) + (3 * ((quantile(house_prices$GarageArea, 0.75) - quantile(house_prices$GarageArea, 0.25)))))
-length(which(house_prices$GarageArea > sev_up))
 ```
 
 *variable 25: WoodDeckSF*
 
 This is a continuous ratio variable. The data is not normally distributed, which is confirmed by the near-null p-value of the shapiro normallity test. It contains no missing values thus imputation is not needed. The variable contains 32 outliers (out of which 3 severe), all on the higher end of the spectrum.
-```{r}
+```{r out.width="50%"}
 summary(house_prices$WoodDeckSF)
-# Plotting
-hist(house_prices$WoodDeckSF,
-  main = "Wood deck area in square feet",
-  xlab = "Area in square feet",
-  ylab = "Density",
-  freq = F,
-)
-curve(dnorm(x, mean(house_prices$WoodDeckSF), sd(house_prices$WoodDeckSF)), add = TRUE, col = "red")
+
 shapiro.test(house_prices$WoodDeckSF)
 # Missing values
 sum(is.na(house_prices$WoodDeckSF))
-
-# Univariant Outliers
-length(Boxplot(house_prices$WoodDeckSF, id = list(n = Inf)))
-sev_up <- (quantile(house_prices$WoodDeckSF, 0.75) + (3 * ((quantile(house_prices$WoodDeckSF, 0.75) - quantile(house_prices$WoodDeckSF, 0.25)))))
-length(which(house_prices$WoodDeckSF > sev_up))
 ```
 
 *variable 26: OpenPorchSF*
 
 This is a continuous ratio variable. The data is not normally distributed, which is confirmed by the near-null p-value of the shapiro normallity test. It contains no missing values thus imputation is not needed. The variable contains 77 outliers (out of which 18 severe), all on the higher end of the spectrum.
-```{r}
+```{r out.width="50%"}
 summary(house_prices$OpenPorchSF)
-# Plotting
-hist(house_prices$OpenPorchSF,
-  main = "Open porch area in square feet",
-  xlab = "Area in square feet",
-  ylab = "Density",
-  freq = F,
-)
-curve(dnorm(x, mean(house_prices$OpenPorchSF), sd(house_prices$OpenPorchSF)), add = TRUE, col = "red")
+
 shapiro.test(house_prices$OpenPorchSF)
 # Missing values
 sum(is.na(house_prices$OpenPorchSF))
-
-# Univariant Outliers
-length(Boxplot(house_prices$OpenPorchSF, id = list(n = Inf)))
-sev_up <- (quantile(house_prices$OpenPorchSF, 0.75) + (3 * ((quantile(house_prices$OpenPorchSF, 0.75) - quantile(house_prices$OpenPorchSF, 0.25)))))
-length(which(house_prices$OpenPorchSF > sev_up))
 ```
 
 *variable 27: EnclosedPorch*
 
 This is a continuous ratio variable. The data is not normally distributed, which is confirmed by the near-null p-value of the shapiro normallity test. It contains no missing values thus imputation is not needed. The variable contains 208 outliers (out of which 208 severe). This occurs because the majority of houses don't have an enclosed porch, so any house with an enclosed porch is considered an outlier.
-```{r}
+```{r out.width="50%"}
 summary(house_prices$EnclosedPorch)
-# Plotting
-hist(house_prices$EnclosedPorch,
-  main = "Enclosed porch area in square feet",
-  xlab = "Area in square feet",
-  ylab = "Density",
-  freq = F,
-)
-curve(dnorm(x, mean(house_prices$EnclosedPorch), sd(house_prices$EnclosedPorch)), add = TRUE, col = "red")
+
 shapiro.test(house_prices$EnclosedPorch)
 # Missing values
 sum(is.na(house_prices$EnclosedPorch))
-
-# Univariant Outliers
-length(Boxplot(house_prices$EnclosedPorch, id = list(n = Inf)))
-sev_up <- (quantile(house_prices$EnclosedPorch, 0.75) + (3 * ((quantile(house_prices$EnclosedPorch, 0.75) - quantile(house_prices$EnclosedPorch, 0.25)))))
-length(which(house_prices$EnclosedPorch > sev_up))
 ```
 
 *variable 28: X3SsnPorch*
 
 This is a continuous ratio variable. The data is not normally distributed, which is confirmed by the near-null p-value of the shapiro normallity test. It contains no missing values thus imputation is not needed. The variable contains 24 outliers (out of which 24 severe). This occurs because the majority of houses don't have a three season porch, so any house with a three season porch is considered an outlier.
-```{r}
+```{r out.width="50%"}
 summary(house_prices$X3SsnPorch)
-# Plotting
-hist(house_prices$X3SsnPorch,
-  main = "Three season porch area in square feet",
-  xlab = "Area in square feet",
-  ylab = "Density",
-  freq = F,
-)
-curve(dnorm(x, mean(house_prices$X3SsnPorch), sd(house_prices$X3SsnPorch)), add = TRUE, col = "red")
+
 shapiro.test(house_prices$X3SsnPorch)
 # Missing values
 sum(is.na(house_prices$X3SsnPorch))
-
-# Univariant Outliers
-length(Boxplot(house_prices$X3SsnPorch, id = list(n = Inf)))
-sev_up <- (quantile(house_prices$X3SsnPorch, 0.75) + (3 * ((quantile(house_prices$X3SsnPorch, 0.75) - quantile(house_prices$X3SsnPorch, 0.25)))))
-length(which(house_prices$X3SsnPorch > sev_up))
 ```
 
 *variable 29: ScreenPorch*
 
 This is a continuous ratio variable. The data is not normally distributed, which is confirmed by the near-null p-value of the shapiro normallity test. It contains no missing values thus imputation is not needed. The variable contains 116 outliers (out of which 116 severe). This occurs because the majority of houses don't have a screen porch, so any house with a screen porch is considered an outlier.
-```{r}
+```{r out.width="50%"}
 summary(house_prices$ScreenPorch)
-# Plotting
-hist(house_prices$ScreenPorch,
-  main = "Screen porch area in square feet",
-  xlab = "Area in square feet",
-  ylab = "Density",
-  freq = F,
-)
-curve(dnorm(x, mean(house_prices$ScreenPorch), sd(house_prices$ScreenPorch)), add = TRUE, col = "red")
+
 shapiro.test(house_prices$ScreenPorch)
 # Missing values
 sum(is.na(house_prices$ScreenPorch))
-
-# Univariant Outliers
-length(Boxplot(house_prices$ScreenPorch, id = list(n = Inf)))
-sev_up <- (quantile(house_prices$ScreenPorch, 0.75) + (3 * ((quantile(house_prices$ScreenPorch, 0.75) - quantile(house_prices$ScreenPorch, 0.25)))))
-length(which(house_prices$ScreenPorch > sev_up))
 ```
 
 *variable 30: PoolArea*
 
 This is a continuous ratio variable. The data is not normally distributed, which is confirmed by the near-null p-value of the shapiro normallity test. It contains no missing values thus imputation is not needed. The variable contains 7 outliers (out of which 7 severe). This occurs because the majority of houses don't have a pool, so any house with a pool is considered an outlier.
-```{r}
+```{r out.width="50%"}
 summary(house_prices$PoolArea)
-# Plotting
-hist(house_prices$PoolArea,
-  main = "Pool area in square feet",
-  xlab = "Area in square feet",
-  ylab = "Density",
-  freq = F,
-)
-curve(dnorm(x, mean(house_prices$PoolArea), sd(house_prices$PoolArea)), add = TRUE, col = "red")
+
 shapiro.test(house_prices$PoolArea)
 # Missing values
 sum(is.na(house_prices$PoolArea))
-
-# Univariant Outliers
-length(Boxplot(house_prices$PoolArea, id = list(n = Inf)))
-sev_up <- (quantile(house_prices$PoolArea, 0.75) + (3 * ((quantile(house_prices$PoolArea, 0.75) - quantile(house_prices$PoolArea, 0.25)))))
-length(which(house_prices$PoolArea > sev_up))
 ```
 
 *variable 31: MiscVal*
 
 This is a continuous ratio variable. The data is not normally distributed, which is confirmed by the near-null p-value of the shapiro normallity test. It contains no missing values thus imputation is not needed. The variable contains 52 outliers (out of which 52 severe). This occurs because the majority of houses don't have miscellaneous features, so any house with a miscellaneous feature is considered an outlier.
-```{r}
+```{r out.width="50%"}
 summary(house_prices$MiscVal)
-# Plotting
-hist(house_prices$MiscVal,
-  main = "$Value of miscellaneous feature",
-  xlab = "$Value",
-  ylab = "Density",
-  freq = F,
-)
-curve(dnorm(x, mean(house_prices$MiscVal), sd(house_prices$MiscVal)), add = TRUE, col = "red")
+
 shapiro.test(house_prices$MiscVal)
 # Missing values
 sum(is.na(house_prices$MiscVal))
 
 # Imputing missing values
 # res.pca<-imputePCA(house_prices[,c(2:)])
-
-# Univariant Outliers
-length(Boxplot(house_prices$MiscVal, id = list(n = Inf)))
-sev_up <- (quantile(house_prices$MiscVal, 0.75) + (3 * ((quantile(house_prices$MiscVal, 0.75) - quantile(house_prices$MiscVal, 0.25)))))
-length(which(house_prices$MiscVal > sev_up))
 ```
 
 *variable 32: MoSold*
 
 This is an ordinal categorical variable. The data is not normally distributed, which is confirmed by the near-null p-value of the shapiro normallity test. It contains no missing values thus imputation is not needed. The variable contains no outliers.
-```{r}
+```{r out.width="50%"}
 summary(house_prices$MoSold)
-# Plotting
-hist(house_prices$MoSold,
-  main = "Month Sold",
-  xlab = "Month Sold",
-  ylab = "Density",
-  freq = F,
-)
-curve(dnorm(x, mean(house_prices$MoSold), sd(house_prices$MoSold)), add = TRUE, col = "red")
+
 shapiro.test(house_prices$MoSold)
 # Missing values
 sum(is.na(house_prices$MoSold))
-
-# Univariant Outliers
-length(Boxplot(house_prices$MoSold, id = list(n = Inf)))
-sev_up <- (quantile(house_prices$MoSold, 0.75) + (3 * ((quantile(house_prices$MoSold, 0.75) - quantile(house_prices$MoSold, 0.25)))))
-length(which(house_prices$MoSold > sev_up))
 ```
 
 *variable 33: YrSold*
 
 This is a discrete numerical variable. The data is not normally distributed, which is confirmed by the near-null p-value of the shapiro normallity test. It contains no missing values thus imputation is not needed. The variable contains no outliers.
-```{r}
+```{r out.width="50%"}
 summary(house_prices$YrSold)
-# Plotting
-barplot(table(house_prices$YrSold), xlab = "Year Sold", ylab = "Frequency", main = "Distribution of YrSold")
 
 shapiro.test(house_prices$YrSold)
 # Missing values
 sum(is.na(house_prices$YrSold))
-
-# Univariant Outliers
-length(Boxplot(house_prices$YrSold, id = list(n = Inf)))
-sev_up <- (quantile(house_prices$YrSold, 0.75) + (3 * ((quantile(house_prices$YrSold, 0.75) - quantile(house_prices$YrSold, 0.25)))))
-length(which(house_prices$YrSold > sev_up))
 ```
 
 *variable 34: SalePrice*
 
 This is a continuous ratio variable. The data is not normally distributed, which is confirmed by the near-null p-value of the shapiro normallity test, but this fact is further answered. It contains no missing values thus imputation is not needed. The variable contains 61 outliers (out of which 12 severe), all on the higher end of the spectrum.
-```{r}
+```{r out.width="50%"}
 summary(house_prices$SalePrice)
-# Plotting
-hist(house_prices$SalePrice,
-  main = "Sale Price",
-  xlab = "Sale Price",
-  ylab = "Density",
-  freq = F,
-)
-curve(dnorm(x, mean(house_prices$SalePrice), sd(house_prices$SalePrice)), add = TRUE, col = "red")
+
 shapiro.test(house_prices$SalePrice)
 # Missing values
 sum(is.na(house_prices$SalePrice))
-
-# Univariant Outliers
-length(Boxplot(house_prices$SalePrice, id = list(n = Inf)))
-sev_up <- (quantile(house_prices$SalePrice, 0.75) + (3 * ((quantile(house_prices$SalePrice, 0.75) - quantile(house_prices$SalePrice, 0.25)))))
-length(which(house_prices$SalePrice > sev_up))
 ```
 
 *variable 35: OverallQual*
 
 This is an ordinal categorical variable with 10 levels in which "Very Poor", "Poor", "Fair" and "Very Excellent" represent less than 3% of the instances combined. It contains no missing values thus imputation is not needed. A bar plot is used to plot the variable.
-```{r}
+```{r out.width="50%"}
 summary(house_prices$OverallQual)
 prop.table(table(house_prices$OverallQual))
-# Plotting
-barplot(table(house_prices$OverallQual),
-  xlab = "Overall Quality",
-  ylab = "Frequency",
-  main = "Distribution of OverallQual"
-)
+
 # Missing values
 sum(is.na(house_prices$OverallQual))
 ```
@@ -1014,16 +766,9 @@ sum(is.na(house_prices$OverallQual))
 *variable 36: Neighborhood*
 
 This is a nominal categorical variable (with 25 levels), in which "College Creek", "Edwards", "North Ames" and "Old Town" represent approximately 40% of the instances combined. It contains no missing values thus imputation is not needed. A bar plot is used to plot the variable.
-```{r}
-summary(house_prices$Neighborhood)
+```{r out.width="50%"}
 prop.table(table(house_prices$Neighborhood))
-# Plotting
-barplot(table(house_prices$Neighborhood),
-  xlab = "",
-  ylab = "Frequency",
-  main = "Distribution of Neighborhood",
-  las = 2
-)
+
 # Missing values
 sum(is.na(house_prices$Neighborhood))
 ```
@@ -1031,15 +776,10 @@ sum(is.na(house_prices$Neighborhood))
 *variable 37: ExterQual*
 
 This is a nominal categorical variable (with 5 levels), in which 62% of the instances are "Average/Typical" and 33% are "Good". The "Poor" level has 0 instances. It contains no missing values thus imputation is not needed. A bar plot is used to plot the variable.
-```{r}
+```{r out.width="50%"}
 summary(house_prices$ExterQual)
 prop.table(table(house_prices$ExterQual))
-# Plotting
-barplot(table(house_prices$ExterQual),
-  xlab = "",
-  ylab = "Frequency",
-  main = "Evaluates the quality of the material on the exterior"
-)
+
 # Missing values
 sum(is.na(house_prices$ExterQual))
 ```
@@ -1047,15 +787,10 @@ sum(is.na(house_prices$ExterQual))
 *variable 38: BsmtQual*
 
 This is a nominal categorical variable (with 6 levels), in which 42% of the instances are "Good (90-99 inches)" and 44% are "Typical (80-89 inches)". The "Poor (<70 inches)" level has 0 instances, and 2.5% of houses don't have a basement. A bar plot is used to plot the variable.
-```{r}
+```{r out.width="50%"}
 table(house_prices$BsmtQual)
 prop.table(table(house_prices$BsmtQual))
-# Plotting
-barplot(table(house_prices$BsmtQual),
-  xlab = "",
-  ylab = "Frequency",
-  main = "Evaluates the height of the basement"
-)
+
 # Missing values ----> añadir si no se ha hecho antes
 sum(is.na(house_prices$BsmtQual))
 ```
@@ -1063,15 +798,10 @@ sum(is.na(house_prices$BsmtQual))
 *variable 39: KitchenQual*
 
 This is a nominal categorical variable (with 5 levels), in which 40% of the instances are "Good" and 50% are "Typical/Average". The "Poor" level has 0 instances. It contains no missing values thus imputation is not needed. A bar plot is used to plot the variable.
-```{r}
+```{r out.width="50%"}
 table(house_prices$KitchenQual)
 prop.table(table(house_prices$KitchenQual))
-# Plotting
-barplot(table(house_prices$KitchenQual),
-  xlab = "",
-  ylab = "Frequency",
-  main = "Kitchen quality"
-)
+
 # Missing values
 sum(is.na(house_prices$KitchenQual))
 ```
@@ -1079,15 +809,10 @@ sum(is.na(house_prices$KitchenQual))
 *variable 40: GarageFinish*
 
 This is a nominal categorical variable (with 4 levels). It is visualized by a bar plot, in which houses with no garage represent only 5.5% of the instances.
-```{r}
+```{r out.width="50%"}
 table(house_prices$GarageFinish)
 prop.table(table(house_prices$GarageFinish))
-# Plotting
-barplot(table(house_prices$GarageFinish),
-  xlab = "",
-  ylab = "Frequency",
-  main = "Interior finish of the garage"
-)
+
 # Missing values ----> añadir si no se ha hecho antes
 sum(is.na(house_prices$GarageFinish))
 ```
@@ -1095,15 +820,10 @@ sum(is.na(house_prices$GarageFinish))
 *variable 41: FireplaceQu*
 
 This is a nominal categorical variable (with 6 levels), in which 49% of the instances are "Good" and 41% are "Average". The "Poor" level has 20 instances (2.6%). 47% of the houses have no fireplace.
-```{r}
+```{r out.width="50%"}
 table(house_prices$FireplaceQu)
 prop.table(table(house_prices$FireplaceQu))
-# Plotting
-barplot(table(house_prices$FireplaceQu),
-  xlab = "",
-  ylab = "Frequency",
-  main = "Fireplace quality"
-)
+
 # Missing values
 sum(is.na(house_prices$FireplaceQu))
 ```
@@ -1111,15 +831,10 @@ sum(is.na(house_prices$FireplaceQu))
 *variable 42: Foundation*
 
 This is a nominal categorical variable (with 6 levels), in which 43% of the instances are "Cinder Block" and 44% are "Poured Contrete". "Wood", "Stone" and "Slab" levels combined represent only 2.2% of the instances. It contains no missing values thus imputation is not needed. A bar plot is used to plot the variable.
-```{r}
+```{r out.width="50%"}
 table(house_prices$Foundation)
 prop.table(table(house_prices$Foundation))
-# Plotting
-barplot(table(house_prices$Foundation),
-  xlab = "",
-  ylab = "Frequency",
-  main = "Type of foundation"
-)
+
 # Missing values
 sum(is.na(house_prices$Foundation))
 ```
@@ -1127,16 +842,10 @@ sum(is.na(house_prices$Foundation))
 *variable 43: GarageType*
 
 This is a nominal categorical variable (with 7 levels), in which 60% of the instances are "Attached to home" and 27% are "Detached from home". "More than one type of garage", "Basement Garage" and "Car Port" levels combined represent only 2.3% of the instances. 5.5% of the houses have no garage
-```{r}
+```{r out.width="50%"}
 table(house_prices$GarageType)
 prop.table(table(house_prices$GarageType))
-# Plotting
-barplot(table(house_prices$GarageType),
-  xlab = "",
-  ylab = "Frequency",
-  main = "Garage location",
-  las = 2
-)
+
 # Missing values
 sum(is.na(house_prices$GarageType))
 ```
@@ -1144,16 +853,9 @@ sum(is.na(house_prices$GarageType))
 *variable 44: MSSubClass*
 
 This is a nominal categorical variable (with 16 levels), in which 37% of the instances are "1-STORY 1946 & NEWER ALL STYLES" and 20% are "2-STORY 1946 & NEWER". "1-STORY W/FINISHED ATTIC ALL AGES", "PUD - MULTILEVEL - INCL SPLIT LEV/FOYER" and "1-1/2 STORY - UNFINISHED ALL AGES" levels combined represent less than 2% of the instances. It contains no missing values thus imputation is not needed. A bar plot is used to plot the variable.
-```{r}
-table(house_prices$MSSubClass)
+```{r out.width="50%"}
 prop.table(table(house_prices$MSSubClass))
-# Plotting
-barplot(table(house_prices$MSSubClass),
-  xlab = "",
-  ylab = "Frequency",
-  main = "Type of dwelling involved in the sale.",
-  las = 2
-)
+
 # Missing values
 sum(is.na(house_prices$MSSubClass))
 ```
@@ -1165,16 +867,15 @@ sum(is.na(house_prices$MSSubClass))
 We have three variables with missing values (GarageYrBlt, LotFrontage, MasVnrArea). 
 - GarageYrBlt has 81 NAs, which correspond to the 81 houses with no garage. Thus, it is impossible to impute a value for these missings. We thought of assigning a sentinel value as 0 to these missing values, but this could affect the imputation of the other variables' missing values. As the correlation between the variables GarageYrBlt and YearBuilt is significantly high (0.83, indicating multicollinearity), and the correlation test returns a near-null p-value, we decided to delete the variable.
 - For the other two variables, the missing values are random, so we decided to use the imputePCA algorithm for imputation. We observed that the imputations haven't changed the dataset significantly.
-```{r}
+```{r out.width="50%"}
 # GarageYrBlt
 ll <- which(is.na(house_prices$GarageYrBlt))
-ll
+
 testdf <- house_prices[-ll, ]
 cor.test(testdf$YearBuilt, testdf$GarageYrBlt)
 house_prices <- subset(house_prices, select = -GarageYrBlt)
 # LotFrontage, MasVnrArea
 res.pca <- imputePCA(house_prices[, c(2:14, 24:34)]) # Imputation for numeric variables only
-summary(res.pca$completeObs)
 house_prices$LotFrontage <- res.pca$completeObs[, 1]
 house_prices$MasVnrArea <- res.pca$completeObs[, 5]
 ```
@@ -1192,14 +893,14 @@ Strong Positive Correlations among Numerical Features (> 0.45):
 Negative Correlations among Features (< -0.40):
  - BsmtUnfSF and BsmtFinSF1 (-0.58)
  - EnclosedPorch and YearBuilt (-0.41)
-```{r}
-cor(house_prices[, c(2:14, 23:34)], method = "spearman")
+```{r out.width="50%"}
+# cor(house_prices[, c(2:14, 23:34)], method = "spearman")
 ```
 
 ### Univariate Outliers
 
 Now the individuals are investigated. First the number of univariate outliers per individual are counted and added in a new variable called ‘univ_outl_count’. Looking at the 2 individuals with the most univariate outliers (>= 8) it can be concluded that they are all houses with a big living area and large LotArea. A correlation matrix confirms this as it shows a positive correlation to GrLiveArea, X1stFlrSF, LotArea and BsmtFinSF2.
-```{r}
+```{r out.width="50%"}
 house_prices$univ_outl_count <- 0
 # List of numeric variables for which outliers are to be counted
 numeric_variables <- c(
@@ -1217,7 +918,7 @@ for (variable in numeric_variables) {
   house_prices$univ_outl_count[outlier_indices] <- house_prices$univ_outl_count[outlier_indices] + 1
 }
 max(house_prices$univ_outl_count)
-house_prices[which(house_prices$univ_outl_count >= 8), ]
+# house_prices[which(house_prices$univ_outl_count >= 8), ]
 
 df_of_interest = house_prices[,c(3,4,8,11,27,14,34,45)]
 cor_outl = cor(df_of_interest)
@@ -1229,9 +930,9 @@ corrplot(cor_outl, method = "number")
 ### Multivariate Outliers
 
 Moutlier is applied on some numerical variables to find multivariate outliers. We chose the variables that don't return a singular matrix. A very mild threshold of 0.15% is chosen as significance level because it already returns a significant amount of outliers, more exactly around 3% of instances. It is chosen to delete these outliers from the data set for the rest of the project.
-```{r}
+```{r out.width="50%"}
 res.out <- Moutlier(house_prices[, c(2, 3, 4, 7, 10, 14, 24, 26, 32, 34)], quantile = 0.9985, col = "blue")
-which((res.out$md > res.out$cutoff) & (res.out$rd > res.out$cutoff))
+# which((res.out$md > res.out$cutoff) & (res.out$rd > res.out$cutoff))
 length(which((res.out$md > res.out$cutoff) & (res.out$rd > res.out$cutoff))) / 1460
 
 par(mfrow = c(1, 1))
@@ -1239,8 +940,8 @@ plot(res.out$md, res.out$rd)
 abline(h = res.out$cutoff, col = "red")
 abline(v = res.out$cutoff, col = "red")
 
-summary(house_prices[which((res.out$md > res.out$cutoff) & (res.out$rd > res.out$cutoff)), ])
-summary(house_prices)
+# summary(house_prices[which((res.out$md > res.out$cutoff) & (res.out$rd > res.out$cutoff)), ])
+# summary(house_prices)
 house_prices <- house_prices[-which((res.out$md > res.out$cutoff) & (res.out$rd > res.out$cutoff)), ]
 ```
 
@@ -1253,7 +954,7 @@ From this acf plot, we can conclude that the `SalePrice` variable does not exhib
 
 From the Shapiro test, we reject the null hypothesis and conclude that the `SalePrice` variable is not normally distributed.
 
-```{r}
+```{r out.width="50%"}
 acf(house_prices$SalePrice)
 
 shapiro.test(house_prices$SalePrice)
@@ -1293,7 +994,7 @@ Following the initial analysis on the numeric variables, these 3 columns have be
 1. Original construction date.
 
 
-```{r}
+```{r out.width="50%"}
 cols <- c("LotFrontage", "LotArea", "YearBuilt")
 new_cols <- c("f.LotFrontage", "f.LotArea", "f.YearBuilt")
 levels_list <- list(
@@ -1310,7 +1011,6 @@ labels_list <- list(
   ) # YearBuilt
 )
 
-# TODO: Do not forget to implement new variable definitions in the test sample.
 house_prices[new_cols] <- lapply(
   seq_along(cols),
   function(i) {
@@ -1334,7 +1034,7 @@ Condes() is an R function from FactoMineR which is used to describe continuous b
 For quantitative variables, we observed 9 variables which showed a high correlation (Correlation > 50 & p-value around 0) with our target variable (SalePrice). These variables are : GrLivArea, GarageCars, GarageArea, TotalBsmtSF, X1stFlrSF, FullBath, TotRmsAbvGrd, YearBuilt & YearRemodAdd. Apparently, the house garages play an important role when determining the sale price. Also the size of the ground living area shows high significance in describing SalePrice. The age of the house (YearBuilt) and the remodelling (YearRemodAdd) is important to the target variable. On the other hand, we observed three variables which were negatively correlated with our target variable (EnclosedPorch, KitchenAbvGr & LowQualiFinSF).  
 
 For qualitative variables, three main features explained the most the variance in our target variable (R2 > 0.5 & p-value~0), which are OverallQual (R2 = 0.70 & p-value = 0), Neighborhood (R2 = 0.59 & p-value ~ 0) and ExterQual (R2 = 0.51 & p-value ~ 0). This is to be expected, as the quality of the materials used to build the house is significantly important to determine the SalePrice. The Neighborhood also explained most of the variance of the SalePrice, as expected. KitchenAbvGr, BedroomAbvGr, BsmtFullBath and HalfBath are poorly associated as they have R2-values under 10%.
-```{r}
+```{r out.width="50%"}
 res.con <- condes(house_prices, num.var = 34)
 # Assessing the description of the num variable by the quantitative variables
 res.con$quanti
@@ -1366,17 +1066,18 @@ We remember that Strong Positive Correlations among Features (> 0.45):
  - EnclosedPorch and YearBuilt (-0.41)
 
 These tests show that the model with all numeric variables performs the best and that no severe collinearity is present in our model.
-```{r}
+```{r out.width="50%"}
 numeric_variables <- sapply(house_prices, is.numeric)
 m1 <- lm(SalePrice ~ ., data = house_prices[, numeric_variables])
-summary(m1)
-alias(m1)
+# summary(m1)
+# alias(m1)
+
 # Creating another model without these variables
 excluded <- c("Id", "TotalBsmtSF", "GrLivArea", "univ_outl_count")
 selected <- numeric_variables & !names(numeric_variables) %in% excluded
 m2 <- lm(SalePrice ~ ., data = house_prices[, selected])
 t <- summary(m2)
-t
+# t
 vif(m2)
 1 / (1 - t$r.squared)
 
@@ -1410,20 +1111,19 @@ Afterwards we created a new model with the output model produced by step. In thi
 
 As a last step to create our model, we introduced all our categorical variables to the model and we run again step() to remove non-significant predictors. Here we discarded LotFrontage, EnclosedPorch, MoSold, GarageFinish, FireplaceQu, Foundation, GarageType, f.LotFrontage, f.LotArea, BsmtFullBath, BsmtHalfBath, FullBath and TotRmsAbvGrd. 
 
-```{r}
+```{r out.width="50%"}
 excluded <- c("Id", "TotalBsmtSF", "GrLivArea", "univ_outl_count", "GarageCars")
 selected <- numeric_variables & !names(numeric_variables) %in% excluded
 m3 <- lm(SalePrice ~ ., data = house_prices[, selected])
-summary(m3)
+# summary(m3)
 # Now excluding no significant predictors
-step(m3)
+step(m3, trace = 0)
 
 # Model with the subselection of variables
 m7 <- lm(formula = SalePrice ~ LotFrontage + LotArea + YearBuilt +
   YearRemodAdd + MasVnrArea + BsmtFinSF1 + BsmtFinSF2 + BsmtUnfSF +
   X1stFlrSF + X2ndFlrSF + GarageArea + WoodDeckSF + OpenPorchSF +
   EnclosedPorch + ScreenPorch + MoSold, data = house_prices)
-summary(m7)
 
 # Adding categorical variables
 m8 <- lm(formula = SalePrice ~ LotFrontage + LotArea + YearBuilt +
@@ -1435,8 +1135,7 @@ m8 <- lm(formula = SalePrice ~ LotFrontage + LotArea + YearBuilt +
   f.LotArea + f.YearBuilt + OverallQual + BsmtFullBath +
   BsmtHalfBath + FullBath + HalfBath + BedroomAbvGr +
   KitchenAbvGr + TotRmsAbvGrd + Fireplaces, data = house_prices)
-summary(m8)
-step(m8)
+# step(m8, trace = 0)
 
 # Final model
 m9 <- lm(formula = SalePrice ~ LotArea + YearBuilt + YearRemodAdd +
@@ -1445,7 +1144,7 @@ m9 <- lm(formula = SalePrice ~ LotArea + YearBuilt + YearRemodAdd +
   ExterQual + BsmtQual + KitchenQual + MSSubClass + Neighborhood +
   f.YearBuilt + OverallQual + HalfBath + BedroomAbvGr + KitchenAbvGr +
   Fireplaces, data = house_prices)
-summary(m9)
+# summary(m9)
 ```
 
 ## Model validation
@@ -1453,7 +1152,7 @@ summary(m9)
 We used different approaches to validate if our model was correct or not. First of all we run diagnostic plots to our model using plot(). By looking into the Residuals vs Fitted plot, we observed homoscedasticity between residuals and fitted values (horizontal band), meaning that the variance of the residuals is constant across all levels of the independent variables. On the other hand, by looking into the Normal Q-Q plot, we observed that the residuals do not follow a complete normal distribution, as the ones in the 3 and -3 quantiles deviate from the straight line.
 Then we visualized the influence of each observation on the fitted values and residuals of our model. Here we observed that 1182, 1325 and 534 had a high influence on our residuals. Afterwards we plotted for each predictor of the model the response versus our data. We observed for every predictor homoscedasticity. We then used residualPlots() to plot residuals vs fitted for each predictor of our model. Again, we observed homoscedasticity. To assess the fit and assumptions of our regression model we used crPlots(). We observed linearity for all our predictors in our model. Finally, we used boxcox() to transform the response variable  to a power of lambda, where lambda is a parameter that is determined such that the transformed variable follows a normal distribution. 
 
-```{r}
+```{r out.width="50%"}
 library(MASS)
 # Diagnostic plots for our model
 par(mfrow = c(2, 2))
@@ -1464,16 +1163,21 @@ par(mfrow = c(1, 1))
 influencePlot(m9, id = list(n = 0))
 
 # Marginal model plots
+par(mfrow = c(2, 2))
 marginalModelPlots(m9, id = list(n = 0))
+par(mfrow = c(1, 1))
 
-# Residual plots
-residualPlots(m9, id = list(n = 0))
+# Residual plots+
+# par(mfrow = c(2, 2))
+# residualPlots(m9, id = list(n = 0))
+# par(mfrow = c(1, 1))
 
 # Component residual plots
-crPlots(m9, id = list(n = 0))
+# par(mfrow = c(2, 2))
+# crPlots(m9, id = list(n = 0))
+par(mfrow = c(1, 1))
 
 # Boxcox
-# FIX: import boxcox
 boxcox(SalePrice ~ LotArea + YearBuilt + YearRemodAdd +
   MasVnrArea + BsmtFinSF1 + BsmtFinSF2 + BsmtUnfSF + X1stFlrSF +
   X2ndFlrSF + GarageArea + WoodDeckSF + OpenPorchSF + ScreenPorch +
@@ -1489,7 +1193,7 @@ The analysis shows that there are 16 residual outliers in the best model, which 
 
 Leveraging the `broom` library, the outliers with large positive or negative residuals are ploted, indicating the best model underestimates or overestimates the sale prive for them. For example, observation number 14 was underestimated by 67,000 dollars. It could correspond to large and luxurious house that have many features not captured by the model. On contrast, observation number 31 was overestimated by 58,000 dollars and could be due to a small and old house with many defects not captured by the model.
 
-```{r}
+```{r out.width="50%"}
 best_model <- m9
 par(mfrow = c(1, 1))
 hist(
@@ -1551,7 +1255,7 @@ The `influencePlot` function is used to create a plot of studentized residuals v
 
 8 a priori influential values were found
 
-```{r}
+```{r out.width="50%"}
 high_leverage <- as.data.frame(influencePlot(
   best_model,
   id = list(n = 3, method = "noteworthy")
@@ -1571,7 +1275,7 @@ The `dfbetas` function calculates the standardized difference in each parameter 
 
 A dfbeta value greater than `2 / sqrt(dim(house_prices)[1])`, indicates a large influence on the parameter estimate. Those values are temporarily removed from the dataset and a new model is reconstructed with it. This new model demontrates an improvement in the R-squared value from 0.916 to 0.9773.
 
-```{r}
+```{r out.width="50%"}
 betas <- as.data.frame(dfbetas(best_model))
 betas_cutoff <- 2 / sqrt(dim(house_prices)[1])
 betas_cutoff
@@ -1632,11 +1336,11 @@ new_model <- lm(
   data = reduced_data
 )
 
-summary(new_model)
-summary(best_model)
+# summary(new_model)
+# summary(best_model)
 
-par(mfrow = c(2, 2))
-plot(best_model)
+# par(mfrow = c(2, 2))
+# plot(best_model)
 
 plot(new_model)
 par(mfrow = c(1, 1))
@@ -1647,7 +1351,7 @@ par(mfrow = c(1, 1))
 ### Load and prepare Test Data
 
 We prepared the test data by retaining only the variables that were used in the model. Upon analysis, we observed the emergence of new levels in MSSubClass, Neighborhood, OverallQual, BedroomAbvGr, and Fireplaces, which were not present in the training dataset. Given that these levels represented only a small number of values, we opted to either eliminate them or combine them with another level, as our model is not equipped to handle them. Additionally, we removed three instances with missing values from GarageArea, BsmtUnfSF, BsmtFinSF1, KitchenQual, BsmtFinSF2, and MasVnrArea, in an effort to potentially mitigate bias introduced by imputation. Finally, we performed imputation on the missing values in MasVnrArea, following the same approach as we did with the training dataset.
-```{r}
+```{r out.width="50%"}
 test_data <- read.csv("test.csv")
 na_factor_cols <- c("BsmtQual", "GarageFinish", "FireplaceQu", "GarageType")
 
@@ -1751,44 +1455,44 @@ test_data[cols] <- lapply(
 
 #New factors deletion
 #MSSubClass
-table(test_data$MSSubClass)
+# table(test_data$MSSubClass)
 prop.table(table(test_data$MSSubClass))
 # Create a logical condition for filtering
 condition <- !(test_data$MSSubClass %in% c("1-STORY W/FINISHED ATTIC ALL AGES", "1-1/2 STORY PUD - ALL AGES"))
 # Subset test_data based on the condition
 test_data <- test_data[condition, ]
 #Neighborhood
-table(test_data$Neighborhood)
+# table(test_data$Neighborhood)
 prop.table(table(test_data$Neighborhood))
 ll <- which(test_data$Neighborhood == "Bluestem");ll
 test_data <- test_data[-ll, ]
 #OverallQual
-table(test_data$OverallQual)
+# table(test_data$OverallQual)
 prop.table(table(test_data$OverallQual))
 ll <- which(test_data$OverallQual == "Poor" | test_data$OverallQual == "Very Poor");ll
 test_data <- test_data[-ll, ]
 #BedroomAbvGr
-table(test_data$BedroomAbvGr)
+# table(test_data$BedroomAbvGr)
 prop.table(table(test_data$BedroomAbvGr))
 ll <- which(test_data$BedroomAbvGr == "0");ll
 test_data <- test_data[-ll, ]
 test_data$BedroomAbvGr <- replace(test_data$BedroomAbvGr, test_data$BedroomAbvGr == 6, 5)
 #Fireplaces
-table(test_data$Fireplaces)
+# table(test_data$Fireplaces)
 prop.table(table(test_data$Fireplaces))
 ll <- which(test_data$Fireplaces == "4");ll
 test_data <- test_data[-ll, ]
 
-summary(test_data)
+# summary(test_data)
 # Missing values
 ll_na <- which(is.na(test_data$GarageArea) | is.na(test_data$BsmtUnfSF) | is.na(test_data$BsmtFinSF1) | is.na(test_data$KitchenQual) | is.na(test_data$BsmtFinSF2));ll_na
 #Discard observations with NA's
 test_data <- test_data[-ll_na,]
 #Impute MasVnrArea
 res.pca <- imputePCA(test_data[, c(1:13)])
-summary(res.pca$completeObs)
+# summary(res.pca$completeObs)
 test_data$MasVnrArea <- res.pca$completeObs[, 4]
-summary(test_data)
+# summary(test_data)
 ```
 
 ### Make predictions
@@ -1798,7 +1502,7 @@ Furthermore, for having a test dataset with the actual target variable, we decid
  - The Coefficient of Variation (CV) of the test dataset (0.3889199) is relatively small compared to the RMSE ratio (0.1214806). This can be seen as a positive aspect, indicating that the model's errors are relatively small relative to the average size of the response variable.
  - The R-squared of 0.9022038 indicates that approximately 90.22% of the variability in the SalePrice can be explained by the independent variables included in the model.
   - Looking at the Scatter Plot, we can say that the points are close to the (y=x) diagonal. Nevertheless their are still some large residuals, because of outliers and missing interactions.
-```{r}
+```{r out.width="50%"}
 final_model <- new_model
 predictions <- predict(final_model, newdata = test_data)
 test_data$PredictedSalePrice <- predictions
@@ -1824,7 +1528,7 @@ final_model2 <- lm(
             Fireplaces,
   data = train_data
 )
-summary(final_model2)
+# summary(final_model2)
 #Validate
 predictions <- predict(final_model2, newdata = test_data)
 actual_values <- test_data$SalePrice
@@ -1852,8 +1556,5 @@ plot(actual_values, residuals, main = "Residual Plot", xlab = "Actual Values", y
 abline(h = 0, col = "red")  # Add a horizontal line at y = 0 for reference
 
 qqPlot(residuals, main = "Quantile-Quantile Plot of Residuals")
-
-plot(predictions, residuals, main = "Fitted vs. Residuals Plot", xlab = "Fitted Values", ylab = "Residuals")
-abline(h = 0, col = "red")  # Add a horizontal line at y = 0 for reference
 ```
 
