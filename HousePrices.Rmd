@@ -1541,6 +1541,81 @@ priori_influential <- row.names(high_leverage[
 priori_influential
 ```
 
+## A posteriori influential data observations
+
+The `dfbetas` function calculates the standardized difference in each parameter estimate with and without each observation, and it can be used to assess the effect of an individual observation on each estimated parameter of the fitted model. A large `dfbeta` value indicates that the observation has a large influence on the corresponding parameter estimate.
+
+A dfbeta value greater than `2 / sqrt(dim(house_prices)[1])`, indicates a large influence on the parameter estimate. Those values are temporarily removed from the dataset and a new model is reconstructed with it. This new model demontrates an improvement in the R-squared value from 0.91 to 0.97.
+
+```{r}
+betas <- as.data.frame(dfbetas(best_model))
+betas_cutoff = 2 / sqrt(dim(house_prices)[1])
+betas_cutoff
+
+
+par(mfrow = c(1, 1))
+matplot(
+  betas,
+  type = "l",
+  lwd = 2,
+  col = rainbow(ncol(betas))
+)
+lines(
+  sqrt(cooks.distance(best_model)),
+  col = 4,
+  lwd = 3
+)
+abline(
+  h = betas_cutoff,
+  lty = 3,
+  lwd = 1,
+  col = 1
+)
+abline(
+  h = -betas_cutoff[1],
+  lty = 3,
+  lwd = 1,
+  col = 1
+)
+legend(
+  "topleft",
+  legend = c("Cook d", "DFBETA Cutoff"),
+  col = c(4, 1),
+  lty = 1:2,
+  cex = 0.8
+)
+
+legend(
+  "bottomleft",
+  legend = names(coef(best_model)),
+  col = rainbow(ncol(betas)),
+  lty = 1:2,
+  cex = 0.8,
+  ncol = 2
+)
+
+large_df <- apply(betas, 1, function(x) any(abs(x) > betas_cutoff))
+reduced_data <- house_prices[!large_df, ]
+new_model <- lm(formula = (
+    SalePrice ~ LotArea + YearBuilt + YearRemodAdd +
+    MasVnrArea + BsmtFinSF1 + X1stFlrSF + X2ndFlrSF + BedroomAbvGr +
+    KitchenAbvGr + Fireplaces + GarageArea + WoodDeckSF + OpenPorchSF +
+    ScreenPorch + OverallQual + Neighborhood + ExterQual + BsmtQual +
+    KitchenQual + GarageType + MSSubClass + f.YearBuilt
+  ),
+  data = reduced_data
+)
+
+summary(new_model)
+summary(best_model)
+
+par(mfrow = c(2, 2))
+plot(best_model)
+
+plot(new_model)
+
+```
+
 ## Model testing with test samples
 
 ### Load and prepare Test Data
