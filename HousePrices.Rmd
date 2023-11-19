@@ -1494,6 +1494,70 @@ boxcox(SalePrice ~ LotArea + YearBuilt + YearRemodAdd +
     total == 1])
 ```
 
+
+## Residual outliers
+
+The analysis shows that there are 16 residual outliers in the best model, which are the observations that have studentized residuals outside the 99% confidence interval. These outliers are shown in red in the boxplot, the residual plot, and the Cook's distance plot. The Cook's distance measures the influence of each observation on the fitted model, and the outliers have relatively high values, indicating that they have a large impact on the model. The summary of the outliers' data frame shows that these outliers have some extreme values or unusual combinations of the predictor variables.
+
+Leveraging the `broom` library, the outliers with large positive or negative residuals are ploted, indicating the best model underestimates or overestimates the sale prive for them. For example, observation number 14 was underestimated by 67,000 dollars. It could correspond to large and luxurious house that have many features not captured by the model. On contrast, observation number 31 was overestimated by 58,000 dollars and could be due to a small and old house with many defects not captured by the model.
+
+```{r}
+best_model <- m9
+par(mfrow = c(1, 1))
+hist(
+  best_model$residuals,
+  freq=FALSE,
+  breaks=20
+)
+curve(
+  dnorm(
+    x,
+    mean(best_model$residuals),
+    sd(best_model$residuals)
+  ),
+  col="blue",
+  add = T
+)
+
+residuals_lower_bound <- quantile(best_model$residuals, 0.005)
+residuals_upper_bound <- quantile(best_model$residuals, 0.995)
+residuals_outliers <- unname(which(
+    best_model$residuals > residuals_upper_bound
+    | best_model$residuals < residuals_lower_bound
+))
+length(residuals_outliers)
+residuals_outliers
+
+Boxplot(best_model$residuals)
+abline(h = residuals_upper_bound, col = "red")
+abline(h = residuals_lower_bound, col = "red")
+
+plot(best_model$residuals)
+abline(h = residuals_upper_bound, col = "red")
+abline(h = residuals_lower_bound, col = "red")
+points(
+  residuals_outliers,
+  best_model$residuals[residuals_outliers],
+  pch = 4,
+  col = "red"
+)
+
+cooks_distance <- cooks.distance(best_model)
+plot(cooks_distance)
+points(residuals_outliers, cooks_distance[residuals_outliers], pch=4, col="red")
+
+residuals_outliers_df <- house_prices[residuals_outliers,]
+residuals_outliers_df$orig_idx <- residuals_outliers
+
+library(broom)
+res <- augment(m9)
+res_outliers <- res[res$.rownames %in% residuals_outliers, ]
+res_outliers <- res_outliers[order(abs(res_outliers$.resid), decreasing = TRUE), ]
+res_outliers <- res_outliers[, c(".rownames", ".fitted", ".resid", "SalePrice", "Neighborhood", "OverallQual", "LotArea", "GarageArea", "BedroomAbvGr")]
+print(res_outliers)
+```
+
+
 ## Model testing with test samples
 
 ### Load and prepare Test Data
