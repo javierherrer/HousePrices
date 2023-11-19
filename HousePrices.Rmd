@@ -1219,9 +1219,8 @@ for (variable in numeric_variables) {
 max(house_prices$univ_outl_count)
 house_prices[which(house_prices$univ_outl_count >= 8), ]
 
-df_of_interest <- house_prices[, c(3, 4, 8, 11, 27, 14, 34, 45)]
-cor_outl <- cor(df_of_interest)
-cor_outl
+df_of_interest = house_prices[,c(3,4,8,11,27,14,34,45)]
+cor_outl = cor(df_of_interest)
 require(corrplot)
 par(mfrow = c(1, 1))
 corrplot(cor_outl, method = "number")
@@ -1570,7 +1569,7 @@ priori_influential
 
 The `dfbetas` function calculates the standardized difference in each parameter estimate with and without each observation, and it can be used to assess the effect of an individual observation on each estimated parameter of the fitted model. A large `dfbeta` value indicates that the observation has a large influence on the corresponding parameter estimate.
 
-A dfbeta value greater than `2 / sqrt(dim(house_prices)[1])`, indicates a large influence on the parameter estimate. Those values are temporarily removed from the dataset and a new model is reconstructed with it. This new model demontrates an improvement in the R-squared value from 0.91 to 0.97.
+A dfbeta value greater than `2 / sqrt(dim(house_prices)[1])`, indicates a large influence on the parameter estimate. Those values are temporarily removed from the dataset and a new model is reconstructed with it. This new model demontrates an improvement in the R-squared value from 0.916 to 0.9773.
 
 ```{r}
 betas <- as.data.frame(dfbetas(best_model))
@@ -1640,21 +1639,55 @@ par(mfrow = c(2, 2))
 plot(best_model)
 
 plot(new_model)
+par(mfrow = c(1, 1))
 ```
 
 ## Model testing with test samples
 
 ### Load and prepare Test Data
+
+We prepared the test data by retaining only the variables that were used in the model. Upon analysis, we observed the emergence of new levels in MSSubClass, Neighborhood, OverallQual, BedroomAbvGr, and Fireplaces, which were not present in the training dataset. Given that these levels represented only a small number of values, we opted to either eliminate them or combine them with another level, as our model is not equipped to handle them. Additionally, we removed three instances with missing values from GarageArea, BsmtUnfSF, BsmtFinSF1, KitchenQual, BsmtFinSF2, and MasVnrArea, in an effort to potentially mitigate bias introduced by imputation. Finally, we performed imputation on the missing values in MasVnrArea, following the same approach as we did with the training dataset.
 ```{r}
 test_data <- read.csv("test.csv")
+na_factor_cols <- c("BsmtQual", "GarageFinish", "FireplaceQu", "GarageType")
 
-# Prepare Test Data
-test_data <- test_data[c("OverallQual", "Neighborhood", "ExterQual", "GrLivArea", "GarageCars", "GarageArea", "TotalBsmtSF", "X1stFlrSF", "YearBuilt", "YearRemodAdd")]
-test_data$OverallQual <- factor(test_data$OverallQual)
-test_data$Neighborhood <- factor(test_data$Neighborhood)
-test_data$ExterQual <- factor(test_data$ExterQual)
+test_data[na_factor_cols] <- lapply(
+  test_data[na_factor_cols],
+  function(x) {
+    replace_na(x, "NA")
+  }
+)
+#Prepare Test Data
+selected_variables <- c("LotArea", "YearBuilt", "YearRemodAdd", "MasVnrArea", 
+                         "BsmtFinSF1", "BsmtFinSF2", "BsmtUnfSF", "X1stFlrSF", 
+                         "X2ndFlrSF", "GarageArea", "WoodDeckSF", "OpenPorchSF", 
+                         "ScreenPorch", "ExterQual", "BsmtQual", "KitchenQual", 
+                         "MSSubClass", "Neighborhood", "OverallQual", 
+                         "HalfBath", "BedroomAbvGr", "KitchenAbvGr", "Fireplaces")
+test_data <- test_data[selected_variables]
+# Specify the variables to be converted to factors
+factor_variables <- c("ExterQual", "BsmtQual", "KitchenQual", 
+                      "MSSubClass", "Neighborhood", "OverallQual", 
+                      "HalfBath", "BedroomAbvGr", "KitchenAbvGr", "Fireplaces")
+# Convert specified variables to factors in test_data
+test_data[factor_variables] <- lapply(
+  test_data[factor_variables],
+  function(var) factor(var)
+)
 
-cols <- c("OverallQual", "Neighborhood", "ExterQual")
+test_data$f.YearBuilt <- factor(
+  cut(
+    test_data$YearBuilt,
+    breaks = c(1872, 1915, 1945, 1960, 1980, 2000, 2010),
+    labels = c("Historic", "Pre-War", "Post-War", "Mid-Century", "Modern", "Contemporary"),
+    right = TRUE,
+    include.lowest = TRUE
+  )
+)
+
+cols <- c(
+  "OverallQual", "Neighborhood", "ExterQual", "BsmtQual", "KitchenQual", "MSSubClass"
+)
 levels_list <- list(
   1:10, # OverallQual
   c(
@@ -1663,8 +1696,15 @@ levels_list <- list(
     "NPkVill", "NridgHt", "NWAmes", "OldTown", "SWISU", "Sawyer", "SawyerW",
     "Somerst", "StoneBr", "Timber", "Veenker"
   ), # Neighborhood
-  c("Ex", "Gd", "TA", "Fa", "Po") # ExterQual
+  c("Ex", "Gd", "TA", "Fa", "Po"), # ExterQual
+  c("Ex", "Gd", "TA", "Fa", "Po", "NA"), # BsmtQual
+  c("Ex", "Gd", "TA", "Fa", "Po"), # KitchenQual
+  c(
+    "20", "30", "40", "45", "50", "60", "70", "75", "80", "85", "90", "120",
+    "150", "160", "180", "190"
+  ) # MSSubClass
 )
+
 labels_list <- list(
   c(
     "Very Poor", "Poor", "Fair", "Below Average", "Average", "Above Average",
@@ -1678,7 +1718,24 @@ labels_list <- list(
     "South & West of Iowa State University", "Sawyer", "Sawyer West",
     "Somerset", "Stone Brook", "Timberland", "Veenker"
   ), # Neighborhood
-  c("Excellent", "Good", "Average/Typical", "Fair", "Poor") # ExterQual
+  c("Excellent", "Good", "Average/Typical", "Fair", "Poor"), # ExterQual
+  c(
+    "Excellent (100+ inches)", "Good (90-99 inches)", "Typical (80-89 inches)",
+    "Fair (70-79 inches)", "Poor (<70 inches)", "No Basement"
+  ), # BsmtQual
+  c("Excellent", "Good", "Typical/Average", "Fair", "Poor"), # KitchenQual
+  c(
+    "1-STORY 1946 & NEWER ALL STYLES", "1-STORY 1945 & OLDER",
+    "1-STORY W/FINISHED ATTIC ALL AGES", "1-1/2 STORY - UNFINISHED ALL AGES",
+    "1-1/2 STORY FINISHED ALL AGES", "2-STORY 1946 & NEWER",
+    "2-STORY 1945 & OLDER", "2-1/2 STORY ALL AGES", "SPLIT OR MULTI-LEVEL",
+    "SPLIT FOYER",
+    "DUPLEX - ALL STYLES AND AGES",
+    "1-STORY PUD (Planned Unit Development) - 1946 & NEWER",
+    "1-1/2 STORY PUD - ALL AGES", "2-STORY PUD - 1946 & NEWER",
+    "PUD - MULTILEVEL - INCL SPLIT LEV/FOYER",
+    "2 FAMILY CONVERSION - ALL STYLES AND AGES"
+  ) # MSSubClass
 )
 
 test_data[cols] <- lapply(
@@ -1691,29 +1748,112 @@ test_data[cols] <- lapply(
     )
   }
 )
+
+#New factors deletion
+#MSSubClass
+table(test_data$MSSubClass)
+prop.table(table(test_data$MSSubClass))
+# Create a logical condition for filtering
+condition <- !(test_data$MSSubClass %in% c("1-STORY W/FINISHED ATTIC ALL AGES", "1-1/2 STORY PUD - ALL AGES"))
+# Subset test_data based on the condition
+test_data <- test_data[condition, ]
+#Neighborhood
+table(test_data$Neighborhood)
+prop.table(table(test_data$Neighborhood))
+ll <- which(test_data$Neighborhood == "Bluestem");ll
+test_data <- test_data[-ll, ]
+#OverallQual
+table(test_data$OverallQual)
+prop.table(table(test_data$OverallQual))
+ll <- which(test_data$OverallQual == "Poor" | test_data$OverallQual == "Very Poor");ll
+test_data <- test_data[-ll, ]
+#BedroomAbvGr
+table(test_data$BedroomAbvGr)
+prop.table(table(test_data$BedroomAbvGr))
+ll <- which(test_data$BedroomAbvGr == "0");ll
+test_data <- test_data[-ll, ]
+test_data$BedroomAbvGr <- replace(test_data$BedroomAbvGr, test_data$BedroomAbvGr == 6, 5)
+#Fireplaces
+table(test_data$Fireplaces)
+prop.table(table(test_data$Fireplaces))
+ll <- which(test_data$Fireplaces == "4");ll
+test_data <- test_data[-ll, ]
+
 summary(test_data)
-ll_na <- which(is.na(test_data$GarageCars) | is.na(test_data$GarageArea) | is.na(test_data$TotalBsmtSF))
-ll_na
-# Discard observaions with NA's
-test_data <- test_data[-ll_na, ]
+# Missing values
+ll_na <- which(is.na(test_data$GarageArea) | is.na(test_data$BsmtUnfSF) | is.na(test_data$BsmtFinSF1) | is.na(test_data$KitchenQual) | is.na(test_data$BsmtFinSF2));ll_na
+#Discard observations with NA's
+test_data <- test_data[-ll_na,]
+#Impute MasVnrArea
+res.pca <- imputePCA(test_data[, c(1:13)])
+summary(res.pca$completeObs)
+test_data$MasVnrArea <- res.pca$completeObs[, 4]
+summary(test_data)
 ```
 
 ### Make predictions
+
+Observing the test dataset, we noticed that the SalePrice variable was not provided. Consequently, we were unable to calculate the accuracy of our prediction. Nevertheless, the interactions between the categorical and numerical variables with the predicted variable closely resemble those in the training dataset.
+Furthermore, for having a test dataset with the actual target variable, we decided to divide our train dataset into two datasets with the `caret` package. We trained our model again with this new split data, and then validated the model with the new test dataset. The interpretations of the obtained results are the following ones.
+ - The Coefficient of Variation (CV) of the test dataset (0.3889199) is relatively small compared to the RMSE ratio (0.1214806). This can be seen as a positive aspect, indicating that the model's errors are relatively small relative to the average size of the response variable.
+ - The R-squared of 0.9022038 indicates that approximately 90.22% of the variability in the SalePrice can be explained by the independent variables included in the model.
+  - Looking at the Scatter Plot, we can say that the points are close to the (y=x) diagonal. Nevertheless their are still some large residuals, because of outliers and missing interactions.
 ```{r}
-# predictions <- predict(final_model, newdata = test_data)
-#
-# # Assuming 'actual_values' are the true values from the test dataset
-# mse <- mean((actual_values - predictions)^2)
-# mae <- mean(abs(actual_values - predictions))
-# rsquared <- 1 - sum((actual_values - predictions)^2) / sum((actual_values - mean(actual_values))^2)
-#
-# # Print or display the metrics
-# cat("Mean Squared Error:", mse, "\n")
-# cat("Mean Absolute Error:", mae, "\n")
-# cat("R-squared:", rsquared, "\n")
-#
-# # Goodness of fit test H0: Model fits data
-# deviance(final_model)
-# pvalue <- 1 - pchisq(deviance(final_model),1);pvalue #I fail to reject the null hypothesis
+final_model <- new_model
+predictions <- predict(final_model, newdata = test_data)
+test_data$PredictedSalePrice <- predictions
+res.con <- condes(test_data, num.var = 25)
+res.con$quanti
+res.con$quali
+
+library(caret)
+# Set seed for reproducibility
+set.seed(123)
+# Create an index for splitting the data
+index <- createDataPartition(house_prices$SalePrice, p = 0.7, list = FALSE)
+# Create training and testing datasets
+train_data <- house_prices[index, ]
+test_data <- house_prices[-index, ]
+
+final_model2 <- lm(
+  formula = SalePrice ~ LotArea + YearBuilt + YearRemodAdd +
+            MasVnrArea + BsmtFinSF1 + BsmtFinSF2 + BsmtUnfSF + X1stFlrSF +
+            X2ndFlrSF + GarageArea + WoodDeckSF + OpenPorchSF + ScreenPorch +
+            ExterQual + BsmtQual + KitchenQual + MSSubClass + Neighborhood +
+            f.YearBuilt + OverallQual + HalfBath + BedroomAbvGr + KitchenAbvGr +
+            Fireplaces,
+  data = train_data
+)
+summary(final_model2)
+#Validate
+predictions <- predict(final_model2, newdata = test_data)
+actual_values <- test_data$SalePrice
+
+rmse <- sqrt(mean((predictions - actual_values)^2))
+r_squared <- 1 - sum((actual_values - predictions)^2) / sum((actual_values - mean(actual_values))^2)
+
+cat("Root Mean Squared Error (RMSE):", rmse, "\n")
+cv_response_variable <- sd(test_data$SalePrice) / mean(test_data$SalePrice);cv_response_variable
+cv_rmse_ratio <- rmse / mean(test_data$SalePrice);cv_rmse_ratio
+
+cat("R-squared:", r_squared, "\n")
+
+residuals <- actual_values - predictions
+
+large_residual_threshold <- 2 * sd(residuals)  
+# Identify indices of points with large residuals
+large_residual_indices <- which(abs(residuals) > large_residual_threshold)
+observations_with_large_residuals <- test_data[large_residual_indices, ]
+plot(actual_values, predictions, main = "Scatter Plot with Large Residuals", xlab = "Actual Values", ylab = "Predicted Values")
+abline(0, 1, col = "red")  # Add a diagonal line for reference
+points(actual_values[large_residual_indices], predictions[large_residual_indices], col = "blue", pch = 16)
+
+plot(actual_values, residuals, main = "Residual Plot", xlab = "Actual Values", ylab = "Residuals")
+abline(h = 0, col = "red")  # Add a horizontal line at y = 0 for reference
+
+qqPlot(residuals, main = "Quantile-Quantile Plot of Residuals")
+
+plot(predictions, residuals, main = "Fitted vs. Residuals Plot", xlab = "Fitted Values", ylab = "Residuals")
+abline(h = 0, col = "red")  # Add a horizontal line at y = 0 for reference
 ```
 
