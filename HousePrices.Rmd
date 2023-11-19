@@ -1521,6 +1521,25 @@ res_outliers <- res_outliers[, c(".rownames", ".fitted", ".resid", "SalePrice", 
 print(res_outliers)
 ```
 
+## A priori influential data observations
+
+The `influencePlot` function is used to create a plot of studentized residuals vs. hat values, identifying the observations with high leverage or high residuals.
+
+8 a priori influential values were found
+
+```{r}
+high_leverage <- as.data.frame(influencePlot(
+  best_model,
+  id = list(n = 3, method="noteworthy")
+))
+
+mean_hat <- mean(high_leverage$Hat)
+priori_influential <- row.names(high_leverage[
+  which(high_leverage$hat > 3 * mean_hat)
+])
+
+priori_influential
+```
 
 ## Model testing with test samples
 
